@@ -52,6 +52,9 @@ public:
         template<typename T>
         T get_col(const int column);
 
+        void reset();
+        void clear_bindings();
+
         const sqlite3_stmt * operator()() const;
         sqlite3_stmt * operator()();
 

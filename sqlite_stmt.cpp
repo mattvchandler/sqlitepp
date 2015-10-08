@@ -24,7 +24,8 @@
 #include "sqlite/sqlite.hpp"
 
 #include <stdexcept>
-#include <system_error>
+
+// TODO: use logic_error when appropriate
 
 Sqlite_db_conn::Stmt::Stmt(const std::string & sql, Sqlite_db_conn & db):
     _db(db())
@@ -40,16 +41,6 @@ Sqlite_db_conn::Stmt::Stmt(const std::string & sql, Sqlite_db_conn & db):
 Sqlite_db_conn::Stmt::~Stmt()
 {
     sqlite3_finalize(_stmt);
-}
-
-const sqlite3_stmt * Sqlite_db_conn::Stmt::operator()() const
-{
-    return _stmt;
-}
-
-sqlite3_stmt * Sqlite_db_conn::Stmt::operator()()
-{
-    return _stmt;
 }
 
 void Sqlite_db_conn::Stmt::bind_null(const int index)
@@ -174,4 +165,29 @@ template<>
 sqlite3_value * Sqlite_db_conn::Stmt::get_col<sqlite3_value *>(const int column)
 {
     return sqlite3_column_value(_stmt, column);
+}
+
+void Sqlite_db_conn::Stmt::reset()
+{
+    int status = sqlite3_reset(_stmt);
+    if(status != SQLITE_OK)
+    {
+        throw std::runtime_error("Error resetting statement (" +
+            std::string(sqlite3_sql(_stmt)) + "): " + sqlite3_errmsg(_db));
+    }
+}
+
+void Sqlite_db_conn::Stmt::clear_bindings()
+{
+    sqlite3_clear_bindings(_stmt);
+}
+
+const sqlite3_stmt * Sqlite_db_conn::Stmt::operator()() const
+{
+    return _stmt;
+}
+
+sqlite3_stmt * Sqlite_db_conn::Stmt::operator()()
+{
+    return _stmt;
 }

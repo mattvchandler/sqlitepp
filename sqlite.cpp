@@ -25,6 +25,8 @@
 
 #include <stdexcept>
 
+// TODO: use logic_error when appropriate
+
 Sqlite_db_conn::Sqlite_db_conn(const std::string & filename)
 {
     int status = sqlite3_open(filename.c_str(), &_db);
