@@ -25,8 +25,6 @@
 
 #include <stdexcept>
 
-// TODO: use logic_error when appropriate
-
 Sqlite_db_conn::Sqlite_db_conn(const std::string & filename)
 {
     int status = sqlite3_open(filename.c_str(), &_db);
@@ -61,7 +59,7 @@ void Sqlite_db_conn::exec(const std::string & sql, int (*callback)(void *, int, 
             err = err_msg;
             sqlite3_free(err_msg);
         }
-        throw std::runtime_error(std::string("Error evaluating SQL (") +
+        throw std::logic_error(std::string("Error evaluating SQL (") +
             sql + "): " + err);
     }
 }
