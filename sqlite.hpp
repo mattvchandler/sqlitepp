@@ -47,6 +47,17 @@ public:
         void bind(const int index, const std::string & val);
         void bind(const int index, const sqlite3_value * val);
 
+        void bind_null(const std::string & name);
+        void bind(const std::string & name);
+        void bind(const std::string & name, const int val);
+        void bind(const std::string & name, const sqlite3_int64 val);
+        void bind(const std::string & name, const double val);
+        void bind(const std::string & name, const std::string & val);
+        void bind(const std::string & name, const sqlite3_value * val);
+
+        std::string bind_parameter_name(const int index);
+        int bind_parameter_index(const std::string & name);
+
         bool step();
 
         template<typename T>
