@@ -38,6 +38,10 @@ public:
     {
     public:
         Stmt(const std::string & sql, Sqlite_db_conn & db);
+        Stmt(const Stmt &) = delete;
+        Stmt(Stmt &&) = default;
+        Stmt & operator=(const Stmt &) = delete;
+        Stmt & operator=(Stmt &&) = default;
         ~Stmt();
 
         void bind_null(const int index);
@@ -76,6 +80,10 @@ public:
     };
 
     Sqlite_db_conn(const std::string & filename);
+    Sqlite_db_conn(const Sqlite_db_conn &) = delete;
+    Sqlite_db_conn(Sqlite_db_conn &&) = default;
+    Sqlite_db_conn & operator=(const Sqlite_db_conn &) = delete;
+    Sqlite_db_conn & operator=(Sqlite_db_conn &&) = default;
     ~Sqlite_db_conn();
 
     Stmt create_statement(const std::string & sql);
