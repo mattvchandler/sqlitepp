@@ -24,6 +24,7 @@
 #ifndef SQLITE_HPP
 #define SQLITE_HPP
 
+#include <stdexcept>
 #include <string>
 
 #include <sqlite3.h>
@@ -70,7 +71,6 @@ public:
         sqlite3_stmt * operator()();
 
     private:
-
         sqlite3_stmt * _stmt = nullptr;
         sqlite3 * _db = nullptr;
     };
@@ -91,6 +91,42 @@ public:
 
 private:
     sqlite3 * _db = nullptr;
+};
+
+class Sqlite_error
+{
+public:
+    virtual ~Sqlite_error() = default;
+    virtual const char * sql() const noexcept
+    { return _sql.c_str(); }
+
+protected:
+    Sqlite_error(const std::string & sql):
+        _sql(sql)
+    {}
+
+private:
+    std::string _sql;
+};
+
+class Sqlite_logic_error: public std::logic_error, public Sqlite_error
+{
+public:
+    Sqlite_logic_error(const std::string & what, const std::string & sql):
+        std::logic_error(what),
+        Sqlite_error(sql)
+    {}
+    virtual ~Sqlite_logic_error() = default;
+};
+
+class Sqlite_runtime_error: public std::runtime_error, public Sqlite_error
+{
+public:
+    Sqlite_runtime_error(const std::string & what, const std::string & sql):
+        std::runtime_error(what),
+        Sqlite_error(sql)
+    {}
+    virtual ~Sqlite_runtime_error() = default;
 };
 
 # endif // SQLITE_HPP

@@ -23,16 +23,14 @@
 
 #include "sqlite/sqlite.hpp"
 
-#include <stdexcept>
-
 Sqlite_db_conn::Sqlite_db_conn(const std::string & filename)
 {
     int status = sqlite3_open(filename.c_str(), &_db);
     if(status != SQLITE_OK)
     {
         sqlite3_close(_db);
-        throw std::runtime_error("Error connecting to db (" +
-            filename + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_runtime_error("Error connecting to db (" +
+            filename + "): " + sqlite3_errmsg(_db), "");
     }
 }
 
@@ -59,8 +57,7 @@ void Sqlite_db_conn::exec(const std::string & sql, int (*callback)(void *, int, 
             err = err_msg;
             sqlite3_free(err_msg);
         }
-        throw std::logic_error(std::string("Error evaluating SQL (") +
-            sql + "): " + err);
+        throw Sqlite_logic_error("Error evaluating SQL: " + err, sql);
     }
 }
 

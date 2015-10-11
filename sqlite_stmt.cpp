@@ -23,8 +23,6 @@
 
 #include "sqlite/sqlite.hpp"
 
-#include <stdexcept>
-
 Sqlite_db_conn::Stmt::Stmt(const std::string & sql, Sqlite_db_conn & db):
     _db(db())
 {
@@ -32,7 +30,7 @@ Sqlite_db_conn::Stmt::Stmt(const std::string & sql, Sqlite_db_conn & db):
 
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error parsing SQL (" + sql + "): " + sqlite3_errmsg(db()));
+        throw Sqlite_logic_error(std::string("Error parsing SQL: ") + sqlite3_errmsg(db()), sql);
     }
 }
 
@@ -46,8 +44,8 @@ void Sqlite_db_conn::Stmt::bind_null(const int index)
     int status = sqlite3_bind_null(_stmt, index);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding index " +
-            std::to_string(index) + " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding index " +
+            std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -61,8 +59,8 @@ void Sqlite_db_conn::Stmt::bind(const int index, const double val)
     int status = sqlite3_bind_double(_stmt, index, val);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding index " +
-            std::to_string(index) + " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding index " +
+            std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -71,8 +69,8 @@ void Sqlite_db_conn::Stmt::bind(const int index, const int val)
     int status = sqlite3_bind_int(_stmt, index, val);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding index " +
-            std::to_string(index) + " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding index " +
+            std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -81,8 +79,8 @@ void Sqlite_db_conn::Stmt::bind(const int index, const sqlite3_int64 val)
     int status = sqlite3_bind_int64(_stmt, index, val);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding index " +
-            std::to_string(index) + " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding index " +
+            std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -91,8 +89,8 @@ void Sqlite_db_conn::Stmt::bind(const int index, const std::string & val)
     int status = sqlite3_bind_text(_stmt, index, val.c_str(), val.length(), SQLITE_TRANSIENT);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding index " +
-            std::to_string(index) + " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding index " +
+            std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -101,8 +99,8 @@ void Sqlite_db_conn::Stmt::bind(const int index, const sqlite3_value * val)
     int status = sqlite3_bind_value(_stmt, index, val);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding index " +
-            std::to_string(index) + " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding index " +
+            std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -111,8 +109,8 @@ void Sqlite_db_conn::Stmt::bind_null(const std::string & name)
     int status = sqlite3_bind_null(_stmt, bind_parameter_index(name));
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding " + name +
-            " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding " + name +
+            ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -126,8 +124,8 @@ void Sqlite_db_conn::Stmt::bind(const std::string & name, const double val)
     int status = sqlite3_bind_double(_stmt, bind_parameter_index(name), val);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding " + name +
-            " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding " + name +
+            ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -136,8 +134,8 @@ void Sqlite_db_conn::Stmt::bind(const std::string & name, const int val)
     int status = sqlite3_bind_int(_stmt, bind_parameter_index(name), val);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding " + name +
-            " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding " + name +
+            ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -146,8 +144,8 @@ void Sqlite_db_conn::Stmt::bind(const std::string & name, const sqlite3_int64 va
     int status = sqlite3_bind_int64(_stmt, bind_parameter_index(name), val);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding " + name +
-            " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding " + name +
+            ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -156,8 +154,8 @@ void Sqlite_db_conn::Stmt::bind(const std::string & name, const std::string & va
     int status = sqlite3_bind_text(_stmt, bind_parameter_index(name), val.c_str(), val.length(), SQLITE_TRANSIENT);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding " + name +
-            " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding " + name +
+            ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -166,8 +164,8 @@ void Sqlite_db_conn::Stmt::bind(const std::string & name, const sqlite3_value * 
     int status = sqlite3_bind_value(_stmt, bind_parameter_index(name), val);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error binding " + name +
-            " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error binding " + name +
+            ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -176,8 +174,8 @@ std::string Sqlite_db_conn::Stmt::bind_parameter_name(const int index)
     const char * name = sqlite3_bind_parameter_name(_stmt, index);
     if(!name)
     {
-        throw std::logic_error("Error looking up bind var name for index " +
-            std::to_string(index) + " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error looking up bind var name for index " +
+            std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
     return std::string(name);
 }
@@ -187,8 +185,8 @@ int Sqlite_db_conn::Stmt::bind_parameter_index(const std::string & name)
     int index = sqlite3_bind_parameter_index(_stmt, name.c_str());
     if(!index)
     {
-        throw std::logic_error("Error looking up index for bind var " +
-            name + " (" + sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error("Error looking up index for bind var " +
+            name + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
     return index;
 }
@@ -206,8 +204,8 @@ bool Sqlite_db_conn::Stmt::step()
     }
     else
     {
-        throw std::logic_error(std::string("Error evaluating SQL (") +
-            sqlite3_sql(_stmt) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error(std::string("Error evaluating SQL: ") +
+            sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
@@ -257,8 +255,8 @@ void Sqlite_db_conn::Stmt::reset()
     int status = sqlite3_reset(_stmt);
     if(status != SQLITE_OK)
     {
-        throw std::logic_error("Error resetting statement (" +
-            std::string(sqlite3_sql(_stmt)) + "): " + sqlite3_errmsg(_db));
+        throw Sqlite_logic_error(std::string("Error resetting statement: ") +
+            sqlite3_errmsg(_db), sqlite3_sql(_stmt));
     }
 }
 
