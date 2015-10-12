@@ -107,22 +107,34 @@ public:
     virtual ~Sqlite_error() = default;
     virtual const char * sql() const noexcept
     { return _sql.c_str(); }
+    virtual int err_code() const noexcept
+    { return _sqlite_error_code; }
+    virtual const char * err_msg() const noexcept
+    {
+        if(!_db)
+            return "";
+
+        return sqlite3_errmsg(_db);
+    }
 
 protected:
-    Sqlite_error(const std::string & sql):
+    Sqlite_error(const std::string & sql, int sqlite_error_code, sqlite3 * db):
         _sql(sql)
     {}
 
 private:
     std::string _sql;
+    int _sqlite_error_code;
+    sqlite3 * _db;
 };
 
 class Sqlite_logic_error: public std::logic_error, public Sqlite_error
 {
 public:
-    Sqlite_logic_error(const std::string & what, const std::string & sql):
+    Sqlite_logic_error(const std::string & what, const std::string & sql,
+            int sqlite_error_code, sqlite3 * db):
         std::logic_error(what),
-        Sqlite_error(sql)
+        Sqlite_error(sql, sqlite_error_code, db)
     {}
     virtual ~Sqlite_logic_error() = default;
 };
@@ -130,9 +142,10 @@ public:
 class Sqlite_runtime_error: public std::runtime_error, public Sqlite_error
 {
 public:
-    Sqlite_runtime_error(const std::string & what, const std::string & sql):
+    Sqlite_runtime_error(const std::string & what, const std::string & sql,
+            int sqlite_error_code, sqlite3 * db):
         std::runtime_error(what),
-        Sqlite_error(sql)
+        Sqlite_error(sql, sqlite_error_code, db)
     {}
     virtual ~Sqlite_runtime_error() = default;
 };

@@ -30,7 +30,7 @@ Sqlite_db_conn::Sqlite_db_conn(const std::string & filename)
     {
         sqlite3_close(_db);
         throw Sqlite_runtime_error("Error connecting to db (" +
-            filename + "): " + sqlite3_errmsg(_db), "");
+            filename + "): " + sqlite3_errmsg(_db), "", status, nullptr);
     }
 }
 
@@ -57,7 +57,7 @@ void Sqlite_db_conn::exec(const std::string & sql, int (*callback)(void *, int, 
             err = err_msg;
             sqlite3_free(err_msg);
         }
-        throw Sqlite_logic_error("Error evaluating SQL: " + err, sql);
+        throw Sqlite_logic_error("Error evaluating SQL: " + err, sql, status, _db);
     }
 }
 
