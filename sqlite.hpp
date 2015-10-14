@@ -101,6 +101,20 @@ private:
     sqlite3 * _db = nullptr;
 };
 
+// TODO: split below into own files
+
+class Database final
+{
+public:
+    Database() = delete;
+    ~Database() = delete;
+    static Sqlite_db_conn & get();
+    static void init(Sqlite_db_conn * db);
+
+private:
+    static Sqlite_db_conn * _db;
+};
+
 class Sqlite_error
 {
 public:
