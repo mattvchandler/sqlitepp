@@ -23,6 +23,8 @@
 
 #include "sqlite/sqlite.hpp"
 
+#include "sqlite/sqlite_error.hpp"
+
 Sqlite_db_conn::Sqlite_db_conn(const std::string & filename)
 {
     int status = sqlite3_open(filename.c_str(), &_db);
@@ -85,18 +87,3 @@ sqlite3 * Sqlite_db_conn::operator()()
 {
     return _db;
 }
-
-Sqlite_db_conn & Database::get()
-{
-    if(!_db)
-        throw std::logic_error("Database not initialized");
-
-    return *_db;
-}
-
-void Database::init(Sqlite_db_conn * db)
-{
-    _db = db;
-}
-
-Sqlite_db_conn * Database::_db = nullptr;

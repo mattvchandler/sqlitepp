@@ -23,6 +23,8 @@
 
 #include "sqlite/sqlite.hpp"
 
+#include "sqlite/sqlite_error.hpp"
+
 Sqlite_db_conn::Stmt::Stmt(const std::string & sql, Sqlite_db_conn & db):
     _db(db())
 {
