@@ -23,16 +23,23 @@
 
 #include "sqlite/sqlite_error.hpp"
 
+Sqlite_error::~Sqlite_error()
+{
+}
+
+// get SQL code where error was thrown
 const char * Sqlite_error::sql() const noexcept
 {
     return _sql.c_str();
 }
 
+// get sqlite3 error code
 int Sqlite_error::err_code() const noexcept
 {
     return _sqlite_error_code;
 }
 
+// get the sqlite3 internal error message
 const char * Sqlite_error::err_msg() const noexcept
 {
     if(!_db)
@@ -42,7 +49,9 @@ const char * Sqlite_error::err_msg() const noexcept
 }
 
 Sqlite_error::Sqlite_error(const std::string & sql, int sqlite_error_code, sqlite3 * db):
-    _sql(sql)
+    _sql(sql),
+    _sqlite_error_code(sqlite_error_code),
+    _db(db)
 {
 }
 

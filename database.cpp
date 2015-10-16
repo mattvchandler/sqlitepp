@@ -25,6 +25,7 @@
 
 #include <stdexcept>
 
+// locate DB
 Sqlite_db_conn & Database::get()
 {
     if(!_db)
@@ -33,9 +34,11 @@ Sqlite_db_conn & Database::get()
     return *_db;
 }
 
+// set DB
 void Database::init(Sqlite_db_conn * db)
 {
     _db = db;
 }
 
+// init to null
 Sqlite_db_conn * Database::_db = nullptr;

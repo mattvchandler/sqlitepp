@@ -25,6 +25,7 @@
 
 #include "sqlite/sqlite_error.hpp"
 
+// prepare a new statement for the given SQL
 Sqlite_db_conn::Stmt::Stmt(const std::string & sql, Sqlite_db_conn & db):
     _db(db())
 {
@@ -41,6 +42,7 @@ Sqlite_db_conn::Stmt::~Stmt()
     sqlite3_finalize(_stmt);
 }
 
+// bind NULL to var by index
 void Sqlite_db_conn::Stmt::bind_null(const int index)
 {
     int status = sqlite3_bind_null(_stmt, index);
@@ -51,11 +53,13 @@ void Sqlite_db_conn::Stmt::bind_null(const int index)
     }
 }
 
+// bind NULL to var by index
 void Sqlite_db_conn::Stmt::bind(const int index)
 {
     bind_null(index);
 }
 
+// bind double to var by index
 void Sqlite_db_conn::Stmt::bind(const int index, const double val)
 {
     int status = sqlite3_bind_double(_stmt, index, val);
@@ -66,6 +70,7 @@ void Sqlite_db_conn::Stmt::bind(const int index, const double val)
     }
 }
 
+// bind int to var by index
 void Sqlite_db_conn::Stmt::bind(const int index, const int val)
 {
     int status = sqlite3_bind_int(_stmt, index, val);
@@ -76,6 +81,7 @@ void Sqlite_db_conn::Stmt::bind(const int index, const int val)
     }
 }
 
+// bind sqlite3_int64 to var by index
 void Sqlite_db_conn::Stmt::bind(const int index, const sqlite3_int64 val)
 {
     int status = sqlite3_bind_int64(_stmt, index, val);
@@ -86,6 +92,7 @@ void Sqlite_db_conn::Stmt::bind(const int index, const sqlite3_int64 val)
     }
 }
 
+// bind std::string to var by index
 void Sqlite_db_conn::Stmt::bind(const int index, const std::string & val)
 {
     int status = sqlite3_bind_text(_stmt, index, val.c_str(), val.length(), SQLITE_TRANSIENT);
@@ -96,6 +103,7 @@ void Sqlite_db_conn::Stmt::bind(const int index, const std::string & val)
     }
 }
 
+// bind sqlite3_value to var by index
 void Sqlite_db_conn::Stmt::bind(const int index, const sqlite3_value * val)
 {
     int status = sqlite3_bind_value(_stmt, index, val);
@@ -106,6 +114,7 @@ void Sqlite_db_conn::Stmt::bind(const int index, const sqlite3_value * val)
     }
 }
 
+// bind null to var by name
 void Sqlite_db_conn::Stmt::bind_null(const std::string & name)
 {
     int status = sqlite3_bind_null(_stmt, bind_parameter_index(name));
@@ -116,11 +125,13 @@ void Sqlite_db_conn::Stmt::bind_null(const std::string & name)
     }
 }
 
+// bind null to var by name
 void Sqlite_db_conn::Stmt::bind(const std::string & name)
 {
     bind_null(name);
 }
 
+// bind double to var by name
 void Sqlite_db_conn::Stmt::bind(const std::string & name, const double val)
 {
     int status = sqlite3_bind_double(_stmt, bind_parameter_index(name), val);
@@ -131,6 +142,7 @@ void Sqlite_db_conn::Stmt::bind(const std::string & name, const double val)
     }
 }
 
+// bind int to var by name
 void Sqlite_db_conn::Stmt::bind(const std::string & name, const int val)
 {
     int status = sqlite3_bind_int(_stmt, bind_parameter_index(name), val);
@@ -141,6 +153,7 @@ void Sqlite_db_conn::Stmt::bind(const std::string & name, const int val)
     }
 }
 
+// bind sqlite3_int64 to var by name
 void Sqlite_db_conn::Stmt::bind(const std::string & name, const sqlite3_int64 val)
 {
     int status = sqlite3_bind_int64(_stmt, bind_parameter_index(name), val);
@@ -151,6 +164,7 @@ void Sqlite_db_conn::Stmt::bind(const std::string & name, const sqlite3_int64 va
     }
 }
 
+// bind std::string to var by name
 void Sqlite_db_conn::Stmt::bind(const std::string & name, const std::string & val)
 {
     int status = sqlite3_bind_text(_stmt, bind_parameter_index(name), val.c_str(), val.length(), SQLITE_TRANSIENT);
@@ -161,6 +175,7 @@ void Sqlite_db_conn::Stmt::bind(const std::string & name, const std::string & va
     }
 }
 
+// bind sqlite3_value to var by name
 void Sqlite_db_conn::Stmt::bind(const std::string & name, const sqlite3_value * val)
 {
     int status = sqlite3_bind_value(_stmt, bind_parameter_index(name), val);
@@ -171,6 +186,7 @@ void Sqlite_db_conn::Stmt::bind(const std::string & name, const sqlite3_value * 
     }
 }
 
+// get bind var name from index
 std::string Sqlite_db_conn::Stmt::bind_parameter_name(const int index)
 {
     const char * name = sqlite3_bind_parameter_name(_stmt, index);
@@ -182,6 +198,7 @@ std::string Sqlite_db_conn::Stmt::bind_parameter_name(const int index)
     return std::string(name);
 }
 
+// get bind var index by name
 int Sqlite_db_conn::Stmt::bind_parameter_index(const std::string & name)
 {
     int index = sqlite3_bind_parameter_index(_stmt, name.c_str());
@@ -193,6 +210,7 @@ int Sqlite_db_conn::Stmt::bind_parameter_index(const std::string & name)
     return index;
 }
 
+// run the statement. for multi-row SELECTs, fetches one row, and returns true when no rows remain
 bool Sqlite_db_conn::Stmt::step()
 {
     int status = sqlite3_step(_stmt);
@@ -211,47 +229,54 @@ bool Sqlite_db_conn::Stmt::step()
     }
 }
 
+// get SELECTed col as double
 template<>
 double Sqlite_db_conn::Stmt::get_col<double>(const int column)
 {
     return sqlite3_column_double(_stmt, column);
 }
 
+// get SELECTed col as int
 template<>
 int Sqlite_db_conn::Stmt::get_col<int>(const int column)
 {
     return sqlite3_column_int(_stmt, column);
 }
 
+// get SELECTed col as sqlite3_int64
 template<>
 sqlite3_int64 Sqlite_db_conn::Stmt::get_col<sqlite3_int64>(const int column)
 {
     return sqlite3_column_int64(_stmt, column);
 }
 
+// get SELECTed col as std::string
 template<>
 std::string Sqlite_db_conn::Stmt::get_col<std::string>(const int column)
 {
     const char * str = reinterpret_cast<const char *>(sqlite3_column_text(_stmt, column));
 
     if(!str)
-        return std::string("");
+        return std::string(""); // empty str for NULL data
     else
         return std::string(str);
 }
 
+// get SELECTed col as const char *
 template<>
 const char * Sqlite_db_conn::Stmt::get_col<const char *>(const int column)
 {
     return reinterpret_cast<const char *>(sqlite3_column_text(_stmt, column));
 }
 
+// get SELECTed col as sqlite3_value *
 template<>
 sqlite3_value * Sqlite_db_conn::Stmt::get_col<sqlite3_value *>(const int column)
 {
     return sqlite3_column_value(_stmt, column);
 }
 
+// reset the statment - useful for INSERTing multiple rows
 void Sqlite_db_conn::Stmt::reset()
 {
     int status = sqlite3_reset(_stmt);
@@ -262,11 +287,13 @@ void Sqlite_db_conn::Stmt::reset()
     }
 }
 
+// clear bind vars to NULL
 void Sqlite_db_conn::Stmt::clear_bindings()
 {
     sqlite3_clear_bindings(_stmt);
 }
 
+// get contained C obj (for use with C API - we don't wrap it all)
 const sqlite3_stmt * Sqlite_db_conn::Stmt::operator()() const
 {
     return _stmt;

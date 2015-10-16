@@ -25,6 +25,7 @@
 
 #include "sqlite/sqlite_error.hpp"
 
+// open / create new DB
 Sqlite_db_conn::Sqlite_db_conn(const std::string & filename)
 {
     int status = sqlite3_open(filename.c_str(), &_db);
@@ -41,11 +42,16 @@ Sqlite_db_conn::~Sqlite_db_conn()
     sqlite3_close(_db);
 }
 
+// create a new prepared statement
 Sqlite_db_conn::Stmt Sqlite_db_conn::create_statement(const std::string & sql)
 {
     return Stmt(sql, *this);
 }
 
+// execute a block of sql
+// callback can be NULL
+// arg will be passed as 1st arg of callback
+// callback(arg, # columns in result, column text arr, column name arr)
 void Sqlite_db_conn::exec(const std::string & sql, int (*callback)(void *, int, char **, char **), void * arg)
 {
     char * err_msg = nullptr;
@@ -63,21 +69,25 @@ void Sqlite_db_conn::exec(const std::string & sql, int (*callback)(void *, int, 
     }
 }
 
+// start a transaction
 void Sqlite_db_conn::begin_transaction()
 {
     exec("BEGIN TRANSACTION;");
 }
 
+// end transaction & commit
 void Sqlite_db_conn::commit()
 {
     exec("COMMIT;");
 }
 
+// end transaction & rollback
 void Sqlite_db_conn::rollback()
 {
     exec("ROLLBACK;");
 }
 
+// get contained C obj (for use with C API - we don't wrap it all)
 const sqlite3 * Sqlite_db_conn::operator()() const
 {
     return _db;

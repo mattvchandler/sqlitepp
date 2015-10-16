@@ -29,12 +29,17 @@
 class Database final
 {
 public:
+    // make noncreatable
     Database() = delete;
     ~Database() = delete;
+
+    // locate DB
     static Sqlite_db_conn & get();
+    // set DB
     static void init(Sqlite_db_conn * db);
 
 private:
+    // associated DB
     static Sqlite_db_conn * _db;
 };
 

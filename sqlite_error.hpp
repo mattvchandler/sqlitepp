@@ -29,12 +29,18 @@
 
 #include <sqlite3.h>
 
+// common data for SQL errors (abstract base)
+// ideally, this would be a concrete class deriving from std::exception,
+// but then our derived exceptions below couldn't derive from std::runtime & logic_errors
 class Sqlite_error
 {
 public:
-    virtual ~Sqlite_error() = default;
+    virtual ~Sqlite_error() = 0;
+    // get SQL code where error was thrown
     virtual const char * sql() const noexcept;
+    // get sqlite3 error code
     virtual int err_code() const noexcept;
+    // get the sqlite3 internal error message
     virtual const char * err_msg() const noexcept;
 
 protected:
@@ -46,7 +52,7 @@ private:
     sqlite3 * _db;
 };
 
-class Sqlite_logic_error: public std::logic_error, public Sqlite_error
+class Sqlite_logic_error: public virtual std::logic_error, public Sqlite_error
 {
 public:
     Sqlite_logic_error(const std::string & what, const std::string & sql,
@@ -54,7 +60,7 @@ public:
     virtual ~Sqlite_logic_error() = default;
 };
 
-class Sqlite_runtime_error: public std::runtime_error, public Sqlite_error
+class Sqlite_runtime_error: public virtual std::runtime_error, public Sqlite_error
 {
 public:
     Sqlite_runtime_error(const std::string & what, const std::string & sql,
