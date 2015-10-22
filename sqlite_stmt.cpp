@@ -257,7 +257,7 @@ std::string Sqlite_db_conn::Stmt::get_col<std::string>(const int column)
     const char * str = reinterpret_cast<const char *>(sqlite3_column_text(_stmt, column));
 
     if(!str)
-        return std::string(""); // empty str for NULL data
+        return std::string(); // empty str for NULL data
     else
         return std::string(str);
 }
