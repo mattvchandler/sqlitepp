@@ -21,6 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// TODO: wrap in a namespace
+
 #include "sqlite/sqlite.hpp"
 
 #include "sqlite/sqlite_error.hpp"
@@ -35,6 +37,7 @@ Sqlite_db_conn::Sqlite_db_conn(const std::string & filename)
         throw Sqlite_runtime_error("Error connecting to db (" +
             filename + "): " + sqlite3_errmsg(_db), "", status, nullptr);
     }
+    sqlite3_extended_result_codes(_db, true);
 }
 
 Sqlite_db_conn::~Sqlite_db_conn()

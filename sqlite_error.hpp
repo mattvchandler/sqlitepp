@@ -40,6 +40,8 @@ public:
     virtual const char * sql() const noexcept;
     // get sqlite3 error code
     virtual int err_code() const noexcept;
+    // get a string version of the sqlite3 error code
+    virtual const char * err_str() const noexcept;
     // get the sqlite3 internal error message
     virtual const char * err_msg() const noexcept;
 

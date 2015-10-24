@@ -39,6 +39,12 @@ int Sqlite_error::err_code() const noexcept
     return _sqlite_error_code;
 }
 
+// get a string version of the sqlite3 error code
+const char * Sqlite_error::err_str() const noexcept
+{
+    return sqlite3_errstr(err_code());
+}
+
 // get the sqlite3 internal error message
 const char * Sqlite_error::err_msg() const noexcept
 {
