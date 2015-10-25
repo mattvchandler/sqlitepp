@@ -25,6 +25,8 @@
 
 #include "sqlite/sqlite_error.hpp"
 
+using namespace std::string_literals;
+
 // prepare a new statement for the given SQL
 Sqlite_db_conn::Stmt::Stmt(const std::string & sql, Sqlite_db_conn & db):
     _db(db())
@@ -33,7 +35,7 @@ Sqlite_db_conn::Stmt::Stmt(const std::string & sql, Sqlite_db_conn & db):
 
     if(status != SQLITE_OK)
     {
-        throw Sqlite_logic_error(std::string("Error parsing SQL: ") + sqlite3_errmsg(db()), sql, status, _db);
+        throw Sqlite_logic_error("Error parsing SQL: "s + sqlite3_errmsg(db()), sql, status, _db);
     }
 }
 
@@ -224,7 +226,7 @@ bool Sqlite_db_conn::Stmt::step()
     }
     else
     {
-        throw Sqlite_logic_error(std::string("Error evaluating SQL: ") +
+        throw Sqlite_logic_error("Error evaluating SQL: "s +
             sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
     }
 }
@@ -257,7 +259,7 @@ std::string Sqlite_db_conn::Stmt::get_col<std::string>(const int column)
     const char * str = reinterpret_cast<const char *>(sqlite3_column_text(_stmt, column));
 
     if(!str)
-        return std::string(); // empty str for NULL data
+        return ""s; // empty str for NULL data
     else
         return std::string(str);
 }
@@ -282,7 +284,7 @@ void Sqlite_db_conn::Stmt::reset()
     int status = sqlite3_reset(_stmt);
     if(status != SQLITE_OK)
     {
-        throw Sqlite_logic_error(std::string("Error resetting statement: ") +
+        throw Sqlite_logic_error("Error resetting statement: "s +
             sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
     }
 }
