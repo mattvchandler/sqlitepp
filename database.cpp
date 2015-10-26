@@ -25,20 +25,23 @@
 
 #include <stdexcept>
 
-// locate DB
-Sqlite_db_conn & Database::get()
+namespace sqlite
 {
-    if(!_db)
-        throw std::logic_error("Database not initialized");
+    // locate DB
+    Connection & Database::get()
+    {
+        if(!_db)
+            throw std::logic_error("Database not initialized");
 
-    return *_db;
-}
+        return *_db;
+    }
 
-// set DB
-void Database::init(Sqlite_db_conn * db)
-{
-    _db = db;
-}
+    // set DB
+    void Database::init(Connection * db)
+    {
+        _db = db;
+    }
 
-// init to null
-Sqlite_db_conn * Database::_db = nullptr;
+    // init to null
+    Connection * Database::_db = nullptr;
+};

@@ -28,114 +28,116 @@
 
 #include <sqlite3.h>
 
-// DB obj
-class Sqlite_db_conn final
+namespace sqlite
 {
-public:
-    class Stmt;
+    // DB connection obj
+    class Connection final
+    {
+    public:
+        class Stmt;
 
-    // open / create new DB
-    Sqlite_db_conn(const std::string & filename);
-    ~Sqlite_db_conn();
+        // open / create new DB
+        Connection(const std::string & filename);
+        ~Connection();
 
-    // non-copyable
-    Sqlite_db_conn(const Sqlite_db_conn &) = delete;
-    Sqlite_db_conn & operator=(const Sqlite_db_conn &) = delete;
+        // non-copyable
+        Connection(const Connection &) = delete;
+        Connection & operator=(const Connection &) = delete;
 
-    // need to explicit say we want default move ctors
-    Sqlite_db_conn(Sqlite_db_conn &&) = default;
-    Sqlite_db_conn & operator=(Sqlite_db_conn &&) = default;
+        // need to explicit say we want default move ctors
+        Connection(Connection &&) = default;
+        Connection & operator=(Connection &&) = default;
 
-    // create a new prepared statement
-    Stmt create_statement(const std::string & sql);
+        // create a new prepared statement
+        Stmt create_statement(const std::string & sql);
 
-    // execute a block of sql
-    // callback can be NULL
-    // arg will be passed as 1st arg of callback
-    // callback(arg, # columns in result, column text arr, column name arr)
-    void exec(const std::string & sql, int (*callback)(void *, int, char **, char **) = nullptr,
-        void * arg = nullptr);
+        // execute a block of sql
+        // callback can be NULL
+        // arg will be passed as 1st arg of callback
+        // callback(arg, # columns in result, column text arr, column name arr)
+        void exec(const std::string & sql, int (*callback)(void *, int, char **, char **) = nullptr,
+            void * arg = nullptr);
 
-    // start a transaction
-    void begin_transaction();
+        // start a transaction
+        void begin_transaction();
 
-    // end transaction & commit
-    void commit();
+        // end transaction & commit
+        void commit();
 
-    // end transaction & rollback
-    void rollback();
+        // end transaction & rollback
+        void rollback();
 
-    // get contained C obj (for use with C API - we don't wrap it all)
-    const sqlite3 * operator()() const;
-    sqlite3 * operator()();
+        // get contained C obj (for use with C API - we don't wrap it all)
+        const sqlite3 * operator()() const;
+        sqlite3 * operator()();
 
-private:
-    // C API's DB obj
-    sqlite3 * _db = nullptr;
+    private:
+        // C API's DB obj
+        sqlite3 * _db = nullptr;
+    };
+
+    // prepared statement obj - usually created by Connection::create_statement
+    class Connection::Stmt final
+    {
+    public:
+        // prepare a new statement for the given SQL
+        Stmt(const std::string & sql, Connection & db);
+        ~Stmt();
+
+        // non-copyable
+        Stmt(const Stmt &) = delete;
+        Stmt & operator=(const Stmt &) = delete;
+
+        // need to explicit say we want default move ctors
+        Stmt(Stmt &&) = default;
+        Stmt & operator=(Stmt &&) = default;
+
+        // bind var by index
+        // note: not all sqlite3 supported types are wrapped yet
+        void bind_null(const int index);
+        void bind(const int index);
+        void bind(const int index, const int val);
+        void bind(const int index, const sqlite3_int64 val);
+        void bind(const int index, const double val);
+        void bind(const int index, const std::string & val);
+        void bind(const int index, const sqlite3_value * val);
+
+        // bind var by name (note: as in C sqlite, bind var indexes start at 1)
+        void bind_null(const std::string & name);
+        void bind(const std::string & name);
+        void bind(const std::string & name, const int val);
+        void bind(const std::string & name, const sqlite3_int64 val);
+        void bind(const std::string & name, const double val);
+        void bind(const std::string & name, const std::string & val);
+        void bind(const std::string & name, const sqlite3_value * val);
+
+        // get bind var name from index
+        std::string bind_parameter_name(const int index);
+        // get bind var index by name
+        int bind_parameter_index(const std::string & name);
+
+        // run the statement. for multi-row SELECTs, fetches one row, and returns true when no rows remain
+        bool step();
+
+        // get SELECTed col
+        // note: not all sqlite3 supported types are wrapped yet
+        template<typename T>
+        T get_col(const int column);
+
+        // reset the statment - useful for INSERTing multiple rows
+        void reset();
+        // clear bind vars to NULL
+        void clear_bindings();
+
+        // get contained C obj (for use with C API - we don't wrap it all)
+        const sqlite3_stmt * operator()() const;
+        sqlite3_stmt * operator()();
+
+    private:
+        // C API statemnt obj
+        sqlite3_stmt * _stmt = nullptr;
+        // copy of C API DB obj
+        sqlite3 * _db = nullptr;
+    };
 };
-
-// prepared statement obj - usually created by Sqlite_db_conn::create_statement
-class Sqlite_db_conn::Stmt final
-{
-public:
-    // prepare a new statement for the given SQL
-    Stmt(const std::string & sql, Sqlite_db_conn & db);
-    ~Stmt();
-
-    // non-copyable
-    Stmt(const Stmt &) = delete;
-    Stmt & operator=(const Stmt &) = delete;
-
-    // need to explicit say we want default move ctors
-    Stmt(Stmt &&) = default;
-    Stmt & operator=(Stmt &&) = default;
-
-    // bind var by index
-    // note: not all sqlite3 supported types are wrapped yet
-    void bind_null(const int index);
-    void bind(const int index);
-    void bind(const int index, const int val);
-    void bind(const int index, const sqlite3_int64 val);
-    void bind(const int index, const double val);
-    void bind(const int index, const std::string & val);
-    void bind(const int index, const sqlite3_value * val);
-
-    // bind var by name (note: as in C sqlite, bind var indexes start at 1)
-    void bind_null(const std::string & name);
-    void bind(const std::string & name);
-    void bind(const std::string & name, const int val);
-    void bind(const std::string & name, const sqlite3_int64 val);
-    void bind(const std::string & name, const double val);
-    void bind(const std::string & name, const std::string & val);
-    void bind(const std::string & name, const sqlite3_value * val);
-
-    // get bind var name from index
-    std::string bind_parameter_name(const int index);
-    // get bind var index by name
-    int bind_parameter_index(const std::string & name);
-
-    // run the statement. for multi-row SELECTs, fetches one row, and returns true when no rows remain
-    bool step();
-
-    // get SELECTed col
-    // note: not all sqlite3 supported types are wrapped yet
-    template<typename T>
-    T get_col(const int column);
-
-    // reset the statment - useful for INSERTing multiple rows
-    void reset();
-    // clear bind vars to NULL
-    void clear_bindings();
-
-    // get contained C obj (for use with C API - we don't wrap it all)
-    const sqlite3_stmt * operator()() const;
-    sqlite3_stmt * operator()();
-
-private:
-    // C API statemnt obj
-    sqlite3_stmt * _stmt = nullptr;
-    // copy of C API DB obj
-    sqlite3 * _db = nullptr;
-};
-
 # endif // SQLITE_HPP

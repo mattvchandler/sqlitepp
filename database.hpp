@@ -26,21 +26,24 @@
 
 #include "sqlite/sqlite.hpp"
 
-class Database final
+namespace sqlite
 {
-public:
-    // make noncreatable
-    Database() = delete;
-    ~Database() = delete;
+    class Database final
+    {
+    public:
+        // make noncreatable
+        Database() = delete;
+        ~Database() = delete;
 
-    // locate DB
-    static Sqlite_db_conn & get();
-    // set DB
-    static void init(Sqlite_db_conn * db);
+        // locate DB
+        static Connection & get();
+        // set DB
+        static void init(Connection * db);
 
-private:
-    // associated DB
-    static Sqlite_db_conn * _db;
+    private:
+        // associated DB
+        static Connection * _db;
+    };
 };
 
 # endif // DATABSE_HPP

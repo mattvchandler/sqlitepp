@@ -23,54 +23,57 @@
 
 #include "sqlite/sqlite_error.hpp"
 
-Sqlite_error::~Sqlite_error()
+namespace sqlite
 {
-}
+    Error::~Error()
+    {
+    }
 
-// get SQL code where error was thrown
-const char * Sqlite_error::sql() const noexcept
-{
-    return _sql.c_str();
-}
+    // get SQL code where error was thrown
+    const char * Error::sql() const noexcept
+    {
+        return _sql.c_str();
+    }
 
-// get sqlite3 error code
-int Sqlite_error::err_code() const noexcept
-{
-    return _sqlite_error_code;
-}
+    // get sqlite3 error code
+    int Error::err_code() const noexcept
+    {
+        return _sqlite_error_code;
+    }
 
-// get a string version of the sqlite3 error code
-const char * Sqlite_error::err_str() const noexcept
-{
-    return sqlite3_errstr(err_code());
-}
+    // get a string version of the sqlite3 error code
+    const char * Error::err_str() const noexcept
+    {
+        return sqlite3_errstr(err_code());
+    }
 
-// get the sqlite3 internal error message
-const char * Sqlite_error::err_msg() const noexcept
-{
-    if(!_db)
-        return "";
+    // get the sqlite3 internal error message
+    const char * Error::err_msg() const noexcept
+    {
+        if(!_db)
+            return "";
 
-    return sqlite3_errmsg(_db);
-}
+        return sqlite3_errmsg(_db);
+    }
 
-Sqlite_error::Sqlite_error(const std::string & sql, int sqlite_error_code, sqlite3 * db):
-    _sql(sql),
-    _sqlite_error_code(sqlite_error_code),
-    _db(db)
-{
-}
+    Error::Error(const std::string & sql, int sqlite_error_code, sqlite3 * db):
+        _sql(sql),
+        _sqlite_error_code(sqlite_error_code),
+        _db(db)
+    {
+    }
 
-Sqlite_logic_error::Sqlite_logic_error(const std::string & what, const std::string & sql,
-        int sqlite_error_code, sqlite3 * db):
-    std::logic_error(what),
-    Sqlite_error(sql, sqlite_error_code, db)
-{
-}
+    Logic_error::Logic_error(const std::string & what, const std::string & sql,
+            int sqlite_error_code, sqlite3 * db):
+        std::logic_error(what),
+        Error(sql, sqlite_error_code, db)
+    {
+    }
 
-Sqlite_runtime_error::Sqlite_runtime_error(const std::string & what, const std::string & sql,
-        int sqlite_error_code, sqlite3 * db):
-    std::runtime_error(what),
-    Sqlite_error(sql, sqlite_error_code, db)
-{
-}
+    Runtime_error::Runtime_error(const std::string & what, const std::string & sql,
+            int sqlite_error_code, sqlite3 * db):
+        std::runtime_error(what),
+        Error(sql, sqlite_error_code, db)
+    {
+    }
+};

@@ -29,45 +29,48 @@
 
 #include <sqlite3.h>
 
-// common data for SQL errors (abstract base)
-// ideally, this would be a concrete class deriving from std::exception,
-// but then our derived exceptions below couldn't derive from std::runtime & logic_errors
-class Sqlite_error
+namespace sqlite
 {
-public:
-    virtual ~Sqlite_error() = 0;
-    // get SQL code where error was thrown
-    virtual const char * sql() const noexcept;
-    // get sqlite3 error code
-    virtual int err_code() const noexcept;
-    // get a string version of the sqlite3 error code
-    virtual const char * err_str() const noexcept;
-    // get the sqlite3 internal error message
-    virtual const char * err_msg() const noexcept;
+    // common data for SQL errors (abstract base)
+    // ideally, this would be a concrete class deriving from std::exception,
+    // but then our derived exceptions below couldn't derive from std::runtime & logic_errors
+    class Error
+    {
+    public:
+        virtual ~Error() = 0;
+        // get SQL code where error was thrown
+        virtual const char * sql() const noexcept;
+        // get sqlite3 error code
+        virtual int err_code() const noexcept;
+        // get a string version of the sqlite3 error code
+        virtual const char * err_str() const noexcept;
+        // get the sqlite3 internal error message
+        virtual const char * err_msg() const noexcept;
 
-protected:
-    Sqlite_error(const std::string & sql, int sqlite_error_code, sqlite3 * db);
+    protected:
+        Error(const std::string & sql, int sqlite_error_code, sqlite3 * db);
 
-private:
-    std::string _sql;
-    int _sqlite_error_code;
-    sqlite3 * _db;
-};
+    private:
+        std::string _sql;
+        int _sqlite_error_code;
+        sqlite3 * _db;
+    };
 
-class Sqlite_logic_error: public virtual std::logic_error, public Sqlite_error
-{
-public:
-    Sqlite_logic_error(const std::string & what, const std::string & sql,
-            int sqlite_error_code, sqlite3 * db);
-    virtual ~Sqlite_logic_error() = default;
-};
+    class Logic_error: public virtual std::logic_error, public Error
+    {
+    public:
+        Logic_error(const std::string & what, const std::string & sql,
+                int sqlite_error_code, sqlite3 * db);
+        virtual ~Logic_error() = default;
+    };
 
-class Sqlite_runtime_error: public virtual std::runtime_error, public Sqlite_error
-{
-public:
-    Sqlite_runtime_error(const std::string & what, const std::string & sql,
-            int sqlite_error_code, sqlite3 * db);
-    virtual ~Sqlite_runtime_error() = default;
+    class Runtime_error: public virtual std::runtime_error, public Error
+    {
+    public:
+        Runtime_error(const std::string & what, const std::string & sql,
+                int sqlite_error_code, sqlite3 * db);
+        virtual ~Runtime_error() = default;
+    };
 };
 
 # endif // SQLITE_ERROR_HPP
