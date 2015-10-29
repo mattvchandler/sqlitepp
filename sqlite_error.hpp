@@ -38,12 +38,16 @@ namespace sqlite
     {
     public:
         virtual ~Error() = 0;
+
         /// Get SQL code where error was thrown
         virtual const char * sql() const noexcept;
+
         /// Get sqlite3 error code
         virtual int err_code() const noexcept;
+
         /// Get a description of the sqlite3 error code
         virtual const char * err_str() const noexcept;
+
         /// Get the sqlite3 error message
         virtual const char * err_msg() const noexcept;
 

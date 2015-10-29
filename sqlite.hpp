@@ -89,6 +89,7 @@ namespace sqlite
 
         /// @returns C sqlite3 object
         const sqlite3 * operator()() const;
+
         /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
 
         /// @returns C sqlite3 object
@@ -134,35 +135,41 @@ namespace sqlite
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
         void bind_null(const int index);
+
         /// Bind null by index
 
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
         void bind(const int index);
+
         /// Bind int var by index
 
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
         /// @param[in] val Bind variable value
         void bind(const int index, const int val);
+
         /// Bind sqlite3_int64 var by index
 
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
         /// @param[in] val Bind variable value
         void bind(const int index, const sqlite3_int64 val);
+
         /// Bind double var by index
 
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
         /// @param[in] val Bind variable value
         void bind(const int index, const double val);
+
         /// Bind string var by index
 
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
         /// @param[in] val Bind variable value
         void bind(const int index, const std::string & val);
+
         /// Bind sqlite3_value var by index
 
         /// @note As in the sqlite C API, bind var indexes start at 1
@@ -174,30 +181,36 @@ namespace sqlite
 
         /// @param[in] name Bind variable name
         void bind_null(const std::string & name);
+
         /// Bind null by name
 
         /// @param[in] name Bind variable name
         void bind(const std::string & name);
+
         /// Bind int var by name
 
         /// @param[in] name Bind variable name
         /// @param[in] val Bind variable value
         void bind(const std::string & name, const int val);
+
         /// Bind sqlite3_int64 var by name
 
         /// @param[in] name Bind variable name
         /// @param[in] val Bind variable value
         void bind(const std::string & name, const sqlite3_int64 val);
+
         /// Bind double var by name
 
         /// @param[in] name Bind variable name
         /// @param[in] val Bind variable value
         void bind(const std::string & name, const double val);
+
         /// Bind string string var by name
 
         /// @param[in] name Bind variable name
         /// @param[in] val Bind variable value
         void bind(const std::string & name, const std::string & val);
+
         /// Bind sqlite3_value var by name
 
         /// @param[in] name Bind variable name
@@ -209,6 +222,7 @@ namespace sqlite
         /// @param[in] index Bind variable index
         /// @returns Bind variable name
         std::string bind_parameter_name(const int index);
+
         /// Get bind var index by name
 
         /// @param[in] name Bind variable name
@@ -234,6 +248,7 @@ namespace sqlite
 
         /// Useful for inserting or updating multiple rows
         void reset();
+
         /// Clear all bind vars to NULL
         void clear_bindings();
 
@@ -242,6 +257,7 @@ namespace sqlite
 
         /// @returns C sqlite3_stmt object
         const sqlite3_stmt * operator()() const;
+
         /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
 
         /// @returns C sqlite3_stmt object
