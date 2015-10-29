@@ -1,5 +1,5 @@
 /// @file
-/// Service locator for database
+/// @brief Service locator for database
 
 // Copyright 2015 Matthew Chandler
 

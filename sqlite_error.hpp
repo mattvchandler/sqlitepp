@@ -1,5 +1,5 @@
 /// @file
-/// Exception types for sqlite errors
+/// @brief Exception types for sqlite errors
 
 // Copyright 2015 Matthew Chandler
 

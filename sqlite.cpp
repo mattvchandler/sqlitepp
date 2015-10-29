@@ -1,5 +1,5 @@
 /// @file
-/// Sqlite library wrapper
+/// @brief Sqlite library wrapper
 
 // Copyright 2015 Matthew Chandler
 
