@@ -1,5 +1,5 @@
-// sqlie_error.hpp
-// exception types for sqlite errors
+/// @file
+/// Exception types for sqlite errors
 
 // Copyright 2015 Matthew Chandler
 
@@ -31,42 +31,55 @@
 
 namespace sqlite
 {
-    // common data for SQL errors (abstract base)
+    /// Common data for SQL errors (abstract base)
     // ideally, this would be a concrete class deriving from std::exception,
     // but then our derived exceptions below couldn't derive from std::runtime & logic_errors
     class Error
     {
     public:
         virtual ~Error() = 0;
-        // get SQL code where error was thrown
+        /// Get SQL code where error was thrown
         virtual const char * sql() const noexcept;
-        // get sqlite3 error code
+        /// Get sqlite3 error code
         virtual int err_code() const noexcept;
-        // get a string version of the sqlite3 error code
+        /// Get a description of the sqlite3 error code
         virtual const char * err_str() const noexcept;
-        // get the sqlite3 internal error message
+        /// Get the sqlite3 error message
         virtual const char * err_msg() const noexcept;
 
     protected:
+        /// @param[in] sql Last SQL code ran
+        /// @param[in] sqlite_error_code Sqlite3 extended error code
+        /// @param[in] db Sqlite3 DB object
         Error(const std::string & sql, int sqlite_error_code, sqlite3 * db);
 
     private:
-        std::string _sql;
-        int _sqlite_error_code;
-        sqlite3 * _db;
+        std::string _sql; ///< SQL code assoicated with the error
+        int _sqlite_error_code; ///< Sqlite3 extended error code
+        sqlite3 * _db; ///< Sqlite3 DB object
     };
 
+    /// SQL Logic error
     class Logic_error: public virtual std::logic_error, public Error
     {
     public:
+        /// @param[in] what %Error message
+        /// @param[in] sql Last SQL code ran
+        /// @param[in] sqlite_error_code Sqlite3 extended error code
+        /// @param[in] db Sqlite3 DB object
         Logic_error(const std::string & what, const std::string & sql,
                 int sqlite_error_code, sqlite3 * db);
         virtual ~Logic_error() = default;
     };
 
+    /// SQL Runtime error
     class Runtime_error: public virtual std::runtime_error, public Error
     {
     public:
+        /// @param[in] what %Error message
+        /// @param[in] sql Last SQL code ran
+        /// @param[in] sqlite_error_code Sqlite3 extended error code
+        /// @param[in] db Sqlite3 DB object
         Runtime_error(const std::string & what, const std::string & sql,
                 int sqlite_error_code, sqlite3 * db);
         virtual ~Runtime_error() = default;

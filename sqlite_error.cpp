@@ -1,5 +1,5 @@
-// sqlie_error.cpp
-// exception types for sqlite errors
+/// @file
+/// Exception types for sqlite errors
 
 // Copyright 2015 Matthew Chandler
 
@@ -23,31 +23,33 @@
 
 #include "sqlite/sqlite_error.hpp"
 
+/// @todo TODO: document exceptions
+
 namespace sqlite
 {
     Error::~Error()
     {
     }
 
-    // get SQL code where error was thrown
+    /// Get SQL code where error was thrown
     const char * Error::sql() const noexcept
     {
         return _sql.c_str();
     }
 
-    // get sqlite3 error code
+    /// Get sqlite3 error code
     int Error::err_code() const noexcept
     {
         return _sqlite_error_code;
     }
 
-    // get a string version of the sqlite3 error code
+    /// Get a description of the sqlite3 error code
     const char * Error::err_str() const noexcept
     {
         return sqlite3_errstr(err_code());
     }
 
-    // get the sqlite3 internal error message
+    /// Get the sqlite3 error message
     const char * Error::err_msg() const noexcept
     {
         if(!_db)
@@ -56,6 +58,9 @@ namespace sqlite
         return sqlite3_errmsg(_db);
     }
 
+    /// @param[in] sql Last SQL code ran
+    /// @param[in] sqlite_error_code Sqlite3 extended error code
+    /// @param[in] db Sqlite3 DB object
     Error::Error(const std::string & sql, int sqlite_error_code, sqlite3 * db):
         _sql(sql),
         _sqlite_error_code(sqlite_error_code),
@@ -63,6 +68,10 @@ namespace sqlite
     {
     }
 
+    /// @param[in] what %Error message
+    /// @param[in] sql Last SQL code ran
+    /// @param[in] sqlite_error_code Sqlite3 extended error code
+    /// @param[in] db Sqlite3 DB object
     Logic_error::Logic_error(const std::string & what, const std::string & sql,
             int sqlite_error_code, sqlite3 * db):
         std::logic_error(what),
@@ -70,6 +79,10 @@ namespace sqlite
     {
     }
 
+    /// @param[in] what %Error message
+    /// @param[in] sql Last SQL code ran
+    /// @param[in] sqlite_error_code Sqlite3 extended error code
+    /// @param[in] db Sqlite3 DB object
     Runtime_error::Runtime_error(const std::string & what, const std::string & sql,
             int sqlite_error_code, sqlite3 * db):
         std::runtime_error(what),

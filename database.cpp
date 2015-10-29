@@ -1,5 +1,5 @@
-// database.cpp
-// service locator for database
+/// @file
+/// Service locator for database
 
 // Copyright 2015 Matthew Chandler
 
@@ -27,7 +27,10 @@
 
 namespace sqlite
 {
-    // locate DB
+    /// Locate DB
+
+    /// @returns DB connection
+    /// @exception std::logic_error when not initialized
     Connection & Database::get()
     {
         if(!_db)
@@ -36,7 +39,9 @@ namespace sqlite
         return *_db;
     }
 
-    // set DB
+    /// Set DB
+
+    /// @param[in] db (non-owning) Pointer to DB connection object, or \c nullptr to de-initialize
     void Database::init(Connection * db)
     {
         _db = db;

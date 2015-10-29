@@ -1,5 +1,5 @@
-// sqlite.cpp
-// sqlite library wrapper
+/// @file
+/// Sqlite library wrapper
 
 // Copyright 2015 Matthew Chandler
 
@@ -27,7 +27,9 @@
 
 namespace sqlite
 {
-    // open / create new DB
+    /// Open / create new DB
+
+    /// @param[in] filename Path to sqlite databse file
     Connection::Connection(const std::string & filename)
     {
         int status = sqlite3_open(filename.c_str(), &_db);
@@ -45,16 +47,24 @@ namespace sqlite
         sqlite3_close(_db);
     }
 
-    // create a new prepared statement
+    /// Create a new prepared statement
+
+    /// @param[in] sql SQL code to prepare
+    /// @return Prepared statement for the SQL code input
     Connection::Stmt Connection::create_statement(const std::string & sql)
     {
         return Stmt(sql, *this);
     }
 
-    // execute a block of sql
-    // callback can be NULL
-    // arg will be passed as 1st arg of callback
-    // callback(arg, # columns in result, column text arr, column name arr)
+    /// Execute SQL statement(s)
+
+    /// Will execute the SQL in-place, without needing to create a Connection::Stmt object.
+    /// @param[in] sql SQL code to execute
+    /// @param[in] callback Function to call for every row. May be NULL. Parameters are:
+    /// - arg: The arg parameter from the exec call
+    /// - column_data: Array of column data (as strings) for the current row
+    /// - column_names: Array of column names
+    /// @param[in,out] arg Data to pass as 1st arg of callback. May be NULL.
     void Connection::exec(const std::string & sql, int (*callback)(void *, int, char **, char **), void * arg)
     {
         char * err_msg = nullptr;
@@ -72,25 +82,27 @@ namespace sqlite
         }
     }
 
-    // start a transaction
+    /// Start a transaction
     void Connection::begin_transaction()
     {
         exec("BEGIN TRANSACTION;");
     }
 
-    // end transaction & commit
+    /// End a transaction & commit
     void Connection::commit()
     {
         exec("COMMIT;");
     }
 
-    // end transaction & rollback
+    /// End a transaction & rollback
     void Connection::rollback()
     {
         exec("ROLLBACK;");
     }
 
-    // get contained C obj (for use with C API - we don't wrap it all)
+    /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
+
+    /// @returns C sqlite3 object
     const sqlite3 * Connection::operator()() const
     {
         return _db;

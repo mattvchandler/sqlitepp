@@ -1,5 +1,5 @@
-// database.hpp
-// service locator for database
+/// @file
+/// Service locator for database
 
 // Copyright 2015 Matthew Chandler
 
@@ -28,6 +28,7 @@
 
 namespace sqlite
 {
+    /// Sqlite Database service locator (Static class)
     class Database final
     {
     public:
@@ -35,13 +36,19 @@ namespace sqlite
         Database() = delete;
         ~Database() = delete;
 
-        // locate DB
+        /// Locate DB
+
+        /// @returns DB connection
+        /// @exception std::logic_error when not initialized
         static Connection & get();
-        // set DB
+
+        /// Set DB
+
+        /// @param[in] db (non-owning) Pointer to DB connection object, or \c nullptr to de-initialize
         static void init(Connection * db);
 
     private:
-        // associated DB
+        /// (non-owned) DB connection
         static Connection * _db;
     };
 };

@@ -1,5 +1,5 @@
-// sqlite_stmt.cpp
-// sqlite statement library wrapper
+/// @file
+/// Sqlite statement library wrapper
 
 // Copyright 2015 Matthew Chandler
 
@@ -29,7 +29,11 @@ using namespace std::string_literals;
 
 namespace sqlite
 {
-    // prepare a new statement for the given SQL
+    /// Prepare a new statement for the given SQL
+
+    /// It is usually easier to use Connection::create_statement instead of this
+    /// @param[in] sql SQL code to prepare
+    /// @param[in] db Database Connection to prepare statement for
     Connection::Stmt::Stmt(const std::string & sql, Connection & db):
         _db(db())
     {
@@ -46,7 +50,10 @@ namespace sqlite
         sqlite3_finalize(_stmt);
     }
 
-    // bind NULL to var by index
+    /// Bind null by index
+
+    /// @note As in the sqlite C API, bind var indexes start at 1
+    /// @param[in] index Bind variable index
     void Connection::Stmt::bind_null(const int index)
     {
         int status = sqlite3_bind_null(_stmt, index);
@@ -57,24 +64,22 @@ namespace sqlite
         }
     }
 
-    // bind NULL to var by index
+    /// @todo TODO: use grouping to tie bind and get_col together
+
+    /// Bind null by index
+
+    /// @note As in the sqlite C API, bind var indexes start at 1
+    /// @param[in] index Bind variable index
     void Connection::Stmt::bind(const int index)
     {
         bind_null(index);
     }
 
-    // bind double to var by index
-    void Connection::Stmt::bind(const int index, const double val)
-    {
-        int status = sqlite3_bind_double(_stmt, index, val);
-        if(status != SQLITE_OK)
-        {
-            throw Logic_error("Error binding index " +
-                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
-        }
-    }
+    /// Bind int var by index
 
-    // bind int to var by index
+    /// @note As in the sqlite C API, bind var indexes start at 1
+    /// @param[in] index Bind variable index
+    /// @param[in] val Bind variable value
     void Connection::Stmt::bind(const int index, const int val)
     {
         int status = sqlite3_bind_int(_stmt, index, val);
@@ -85,7 +90,11 @@ namespace sqlite
         }
     }
 
-    // bind sqlite3_int64 to var by index
+    /// Bind sqlite3_int64 var by index
+
+    /// @note As in the sqlite C API, bind var indexes start at 1
+    /// @param[in] index Bind variable index
+    /// @param[in] val Bind variable value
     void Connection::Stmt::bind(const int index, const sqlite3_int64 val)
     {
         int status = sqlite3_bind_int64(_stmt, index, val);
@@ -96,7 +105,26 @@ namespace sqlite
         }
     }
 
-    // bind std::string to var by index
+    /// Bind double var by index
+
+    /// @note As in the sqlite C API, bind var indexes start at 1
+    /// @param[in] index Bind variable index
+    /// @param[in] val Bind variable value
+    void Connection::Stmt::bind(const int index, const double val)
+    {
+        int status = sqlite3_bind_double(_stmt, index, val);
+        if(status != SQLITE_OK)
+        {
+            throw Logic_error("Error binding index " +
+                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+        }
+    }
+
+    /// Bind string var by index
+
+    /// @note As in the sqlite C API, bind var indexes start at 1
+    /// @param[in] index Bind variable index
+    /// @param[in] val Bind variable value
     void Connection::Stmt::bind(const int index, const std::string & val)
     {
         int status = sqlite3_bind_text(_stmt, index, val.c_str(), val.length(), SQLITE_TRANSIENT);
@@ -107,7 +135,11 @@ namespace sqlite
         }
     }
 
-    // bind sqlite3_value to var by index
+    /// Bind sqlite3_value var by index
+
+    /// @note As in the sqlite C API, bind var indexes start at 1
+    /// @param[in] index Bind variable index
+    /// @param[in] val Bind variable value
     void Connection::Stmt::bind(const int index, const sqlite3_value * val)
     {
         int status = sqlite3_bind_value(_stmt, index, val);
@@ -118,7 +150,9 @@ namespace sqlite
         }
     }
 
-    // bind null to var by name
+    /// Bind null by name
+
+    /// @param[in] name Bind variable name
     void Connection::Stmt::bind_null(const std::string & name)
     {
         int status = sqlite3_bind_null(_stmt, bind_parameter_index(name));
@@ -129,24 +163,18 @@ namespace sqlite
         }
     }
 
-    // bind null to var by name
+    /// Bind null by name
+
+    /// @param[in] name Bind variable name
     void Connection::Stmt::bind(const std::string & name)
     {
         bind_null(name);
     }
 
-    // bind double to var by name
-    void Connection::Stmt::bind(const std::string & name, const double val)
-    {
-        int status = sqlite3_bind_double(_stmt, bind_parameter_index(name), val);
-        if(status != SQLITE_OK)
-        {
-            throw Logic_error("Error binding " + name +
-                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
-        }
-    }
+    /// Bind int var by name
 
-    // bind int to var by name
+    /// @param[in] name Bind variable name
+    /// @param[in] val Bind variable value
     void Connection::Stmt::bind(const std::string & name, const int val)
     {
         int status = sqlite3_bind_int(_stmt, bind_parameter_index(name), val);
@@ -157,7 +185,10 @@ namespace sqlite
         }
     }
 
-    // bind sqlite3_int64 to var by name
+    /// Bind sqlite3_int64 var by name
+
+    /// @param[in] name Bind variable name
+    /// @param[in] val Bind variable value
     void Connection::Stmt::bind(const std::string & name, const sqlite3_int64 val)
     {
         int status = sqlite3_bind_int64(_stmt, bind_parameter_index(name), val);
@@ -168,7 +199,24 @@ namespace sqlite
         }
     }
 
-    // bind std::string to var by name
+    /// Bind double var by name
+
+    /// @param[in] name Bind variable name
+    /// @param[in] val Bind variable value
+    void Connection::Stmt::bind(const std::string & name, const double val)
+    {
+        int status = sqlite3_bind_double(_stmt, bind_parameter_index(name), val);
+        if(status != SQLITE_OK)
+        {
+            throw Logic_error("Error binding " + name +
+                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+        }
+    }
+
+    /// Bind string string var by name
+
+    /// @param[in] name Bind variable name
+    /// @param[in] val Bind variable value
     void Connection::Stmt::bind(const std::string & name, const std::string & val)
     {
         int status = sqlite3_bind_text(_stmt, bind_parameter_index(name), val.c_str(), val.length(), SQLITE_TRANSIENT);
@@ -179,7 +227,10 @@ namespace sqlite
         }
     }
 
-    // bind sqlite3_value to var by name
+    /// Bind sqlite3_value var by name
+
+    /// @param[in] name Bind variable name
+    /// @param[in] val Bind variable value
     void Connection::Stmt::bind(const std::string & name, const sqlite3_value * val)
     {
         int status = sqlite3_bind_value(_stmt, bind_parameter_index(name), val);
@@ -190,7 +241,10 @@ namespace sqlite
         }
     }
 
-    // get bind var name from index
+    /// Get bind var name from index
+
+    /// @param[in] index Bind variable index
+    /// @returns Bind variable name
     std::string Connection::Stmt::bind_parameter_name(const int index)
     {
         const char * name = sqlite3_bind_parameter_name(_stmt, index);
@@ -202,7 +256,10 @@ namespace sqlite
         return std::string(name);
     }
 
-    // get bind var index by name
+    /// Get bind var index by name
+
+    /// @param[in] name Bind variable name
+    /// @returns Bind variable index
     int Connection::Stmt::bind_parameter_index(const std::string & name)
     {
         int index = sqlite3_bind_parameter_index(_stmt, name.c_str());
@@ -214,7 +271,11 @@ namespace sqlite
         return index;
     }
 
-    // run the statement. for multi-row SELECTs, fetches one row, and returns true when no rows remain
+    /// Run the statement.
+
+    /// @returns
+    /// - \c true on SELECT statements when more rows remain to be fetched
+    /// - \c false for UPDATE, DELETE, or database commands, or when no more rows can be SELECTED
     bool Connection::Stmt::step()
     {
         int status = sqlite3_step(_stmt);
@@ -233,28 +294,46 @@ namespace sqlite
         }
     }
 
-    // get SELECTed col as double
-    template<>
-    double Connection::Stmt::get_col<double>(const int column)
-    {
-        return sqlite3_column_double(_stmt, column);
-    }
+    /// @todo TODO: wrap remaining supported types
 
-    // get SELECTed col as int
+    /// Get SELECTed column as int
+
+    /// @param[in] column Column number
+    /// - Unlike bind() indexes, column indexes start at 0
+    /// @returns Column data for the current row
     template<>
     int Connection::Stmt::get_col<int>(const int column)
     {
         return sqlite3_column_int(_stmt, column);
     }
 
-    // get SELECTed col as sqlite3_int64
+    /// Get SELECTed column as sqlite3_int64
+
+    /// @param[in] column Column number
+    /// - Unlike bind() indexes, column indexes start at 0
+    /// @returns Column data for the current row
     template<>
     sqlite3_int64 Connection::Stmt::get_col<sqlite3_int64>(const int column)
     {
         return sqlite3_column_int64(_stmt, column);
     }
 
-    // get SELECTed col as std::string
+    /// Get SELECTed column as double
+
+    /// @param[in] column Column number
+    /// - Unlike bind() indexes, column indexes start at 0
+    /// @returns Column data for the current row
+    template<>
+    double Connection::Stmt::get_col<double>(const int column)
+    {
+        return sqlite3_column_double(_stmt, column);
+    }
+
+    /// Get SELECTed column as string
+
+    /// @param[in] column Column number
+    /// - Unlike bind() indexes, column indexes start at 0
+    /// @returns Column data for the current row
     template<>
     std::string Connection::Stmt::get_col<std::string>(const int column)
     {
@@ -266,21 +345,35 @@ namespace sqlite
             return std::string(str);
     }
 
-    // get SELECTed col as const char *
+    /// @todo TODO: search code for where using const char * instead of string may be more efficient
+
+    /// Get SELECTed column as C string
+
+    /// @param[in] column Column number
+    /// - Unlike bind() indexes, column indexes start at 0
+    /// @returns Column data for the current row
     template<>
     const char * Connection::Stmt::get_col<const char *>(const int column)
     {
         return reinterpret_cast<const char *>(sqlite3_column_text(_stmt, column));
     }
 
-    // get SELECTed col as sqlite3_value *
+    /// @todo TODO: create wrapper for sqlite3_value?
+
+    /// Get SELECTed column as sqlite3_value
+
+    /// @param[in] column Column number
+    /// - Unlike bind() indexes, column indexes start at 0
+    /// @returns Column data for the current row
     template<>
     sqlite3_value * Connection::Stmt::get_col<sqlite3_value *>(const int column)
     {
         return sqlite3_column_value(_stmt, column);
     }
 
-    // reset the statment - useful for INSERTing multiple rows
+    /// Reset the statement
+
+    /// Useful for inserting or updating multiple rows
     void Connection::Stmt::reset()
     {
         int status = sqlite3_reset(_stmt);
@@ -291,18 +384,23 @@ namespace sqlite
         }
     }
 
-    // clear bind vars to NULL
+    /// Clear bind vars to NULL
     void Connection::Stmt::clear_bindings()
     {
         sqlite3_clear_bindings(_stmt);
     }
 
-    // get contained C obj (for use with C API - we don't wrap it all)
+    /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
+
+    /// @returns C sqlite3_stmt object
     const sqlite3_stmt * Connection::Stmt::operator()() const
     {
         return _stmt;
     }
 
+    /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
+
+    /// @returns C sqlite3_stmt object
     sqlite3_stmt * Connection::Stmt::operator()()
     {
         return _stmt;
