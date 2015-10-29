@@ -29,6 +29,7 @@
 
 #include <sqlite3.h>
 
+/// @ingroup sqlite
 namespace sqlite
 {
     /// Common data for SQL errors (abstract base)

@@ -31,6 +31,8 @@
 /// @todo TODO: wrap entire sqlite3 library?
 
 /// Sqlite C++ wrapper and associated types
+
+/// @ingroup sqlite
 namespace sqlite
 {
     /// Sqlite database connection

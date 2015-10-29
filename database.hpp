@@ -26,6 +26,7 @@
 
 #include "sqlite/sqlite.hpp"
 
+/// @ingroup sqlite
 namespace sqlite
 {
     /// Sqlite Database service locator (Static class)
