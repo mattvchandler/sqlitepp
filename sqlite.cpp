@@ -30,6 +30,7 @@ namespace sqlite
     /// Open / create new DB
 
     /// @param[in] filename Path to sqlite databse file
+    /// @exception sqlite::Runtime_error on error opening the DB
     Connection::Connection(const std::string & filename)
     {
         int status = sqlite3_open(filename.c_str(), &_db);
@@ -65,6 +66,7 @@ namespace sqlite
     /// - column_data: Array of column data (as strings) for the current row
     /// - column_names: Array of column names
     /// @param[in,out] arg Data to pass as 1st arg of callback. May be NULL.
+    /// @exception sqlite::Logic_error on error executing the SQL
     void Connection::exec(const std::string & sql, int (*callback)(void *, int, char **, char **), void * arg)
     {
         char * err_msg = nullptr;

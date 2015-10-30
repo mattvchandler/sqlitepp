@@ -23,8 +23,6 @@
 
 #include "sqlite/sqlite_error.hpp"
 
-/// @todo TODO: document exceptions
-
 namespace sqlite
 {
     Error::~Error()
