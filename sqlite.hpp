@@ -55,9 +55,7 @@ namespace sqlite
         Connection & operator=(const Connection &) = delete;
 
         // need to explicitly say we want default move ctors
-        /// Move constructor
         Connection(Connection &&) = default;
-        /// Move constructor
         Connection & operator=(Connection &&) = default;
 
         /// Create a new prepared statement
@@ -125,9 +123,7 @@ namespace sqlite
         Stmt & operator=(const Stmt &) = delete;
 
         // need to explicit say we want default move ctors
-        /// Move constructor
         Stmt(Stmt &&) = default;
-        /// Move constructor
         Stmt & operator=(Stmt &&) = default;
 
         /// @todo TODO: bind and get remaining sqlite3 types, including const char *, possibly cast for int64_t
