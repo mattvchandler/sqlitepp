@@ -105,12 +105,12 @@ namespace sqlite
     /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
 
     /// @returns C sqlite3 object
-    const sqlite3 * Connection::operator()() const
+    const sqlite3 * Connection::get_c_obj() const
     {
         return _db;
     }
 
-    sqlite3 * Connection::operator()()
+    sqlite3 * Connection::get_c_obj()
     {
         return _db;
     }

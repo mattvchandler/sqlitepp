@@ -90,12 +90,12 @@ namespace sqlite
         /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
 
         /// @returns C sqlite3 object
-        const sqlite3 * operator()() const;
+        const sqlite3 * get_c_obj() const;
 
         /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
 
         /// @returns C sqlite3 object
-        sqlite3 * operator()();
+        sqlite3 * get_c_obj();
 
     private:
         /// sqlite C API's DB connection obj
@@ -254,16 +254,15 @@ namespace sqlite
         /// Clear all bind vars to NULL
         void clear_bindings();
 
-        /// @todo TODO change into named methods, possibly use operator() as a synonym for step?
         /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
 
         /// @returns C sqlite3_stmt object
-        const sqlite3_stmt * operator()() const;
+        const sqlite3_stmt * get_c_obj() const;
 
         /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
 
         /// @returns C sqlite3_stmt object
-        sqlite3_stmt * operator()();
+        sqlite3_stmt * get_c_obj();
 
     private:
         /// Sqlite C API's prepared statement obj

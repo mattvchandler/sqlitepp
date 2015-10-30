@@ -36,13 +36,13 @@ namespace sqlite
     /// @param[in] db Database Connection to prepare statement for
     /// @exception sqlite::Logic_error on SQL parsing error
     Connection::Stmt::Stmt(const std::string & sql, Connection & db):
-        _db(db())
+        _db(db.get_c_obj())
     {
-        int status = sqlite3_prepare_v2(db(), sql.c_str(), sql.length() + 1, &_stmt, NULL);
+        int status = sqlite3_prepare_v2(db.get_c_obj(), sql.c_str(), sql.length() + 1, &_stmt, NULL);
 
         if(status != SQLITE_OK)
         {
-            throw Logic_error("Error parsing SQL: "s + sqlite3_errmsg(db()), sql, status, _db);
+            throw Logic_error("Error parsing SQL: "s + sqlite3_errmsg(db.get_c_obj()), sql, status, _db);
         }
     }
 
@@ -425,7 +425,7 @@ namespace sqlite
     /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
 
     /// @returns C sqlite3_stmt object
-    const sqlite3_stmt * Connection::Stmt::operator()() const
+    const sqlite3_stmt * Connection::Stmt::get_c_obj() const
     {
         return _stmt;
     }
@@ -433,7 +433,7 @@ namespace sqlite
     /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
 
     /// @returns C sqlite3_stmt object
-    sqlite3_stmt * Connection::Stmt::operator()()
+    sqlite3_stmt * Connection::Stmt::get_c_obj()
     {
         return _stmt;
     }
