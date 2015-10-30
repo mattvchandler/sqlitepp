@@ -27,10 +27,6 @@
 
 namespace sqlite
 {
-    /// Open / create new DB
-
-    /// @param[in] filename Path to sqlite databse file
-    /// @exception sqlite::Runtime_error on error opening the DB
     Connection::Connection(const std::string & filename)
     {
         int status = sqlite3_open(filename.c_str(), &_db);
@@ -48,25 +44,11 @@ namespace sqlite
         sqlite3_close(_db);
     }
 
-    /// Create a new prepared statement
-
-    /// @param[in] sql SQL code to prepare
-    /// @return Prepared statement for the SQL code input
     Connection::Stmt Connection::create_statement(const std::string & sql)
     {
         return Stmt(sql, *this);
     }
 
-    /// Execute SQL statement(s)
-
-    /// Will execute the SQL in-place, without needing to create a Connection::Stmt object.
-    /// @param[in] sql SQL code to execute
-    /// @param[in] callback Function to call for every row. May be NULL. Parameters are:
-    /// - arg: The arg parameter from the exec call
-    /// - column_data: Array of column data (as strings) for the current row
-    /// - column_names: Array of column names
-    /// @param[in,out] arg Data to pass as 1st arg of callback. May be NULL.
-    /// @exception sqlite::Logic_error on error executing the SQL
     void Connection::exec(const std::string & sql, int (*callback)(void *, int, char **, char **), void * arg)
     {
         char * err_msg = nullptr;
@@ -84,27 +66,21 @@ namespace sqlite
         }
     }
 
-    /// Start a transaction
     void Connection::begin_transaction()
     {
         exec("BEGIN TRANSACTION;");
     }
 
-    /// End a transaction & commit
     void Connection::commit()
     {
         exec("COMMIT;");
     }
 
-    /// End a transaction & rollback
     void Connection::rollback()
     {
         exec("ROLLBACK;");
     }
 
-    /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
-
-    /// @returns C sqlite3 object
     const sqlite3 * Connection::get_c_obj() const
     {
         return _db;

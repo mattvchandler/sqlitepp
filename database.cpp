@@ -27,10 +27,6 @@
 
 namespace sqlite
 {
-    /// Locate DB
-
-    /// @returns DB connection
-    /// @exception std::logic_error when not initialized
     Connection & Database::get()
     {
         if(!_db)
@@ -39,9 +35,6 @@ namespace sqlite
         return *_db;
     }
 
-    /// Set DB
-
-    /// @param[in] db (non-owning) Pointer to DB connection object, or \c nullptr to de-initialize
     void Database::init(Connection * db)
     {
         _db = db;

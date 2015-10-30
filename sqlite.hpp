@@ -87,12 +87,12 @@ namespace sqlite
         /// End a transaction & rollback
         void rollback();
 
-        /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
+        /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a>)
 
         /// @returns C sqlite3 object
         const sqlite3 * get_c_obj() const;
 
-        /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
+        /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a>)
 
         /// @returns C sqlite3 object
         sqlite3 * get_c_obj();
@@ -254,12 +254,12 @@ namespace sqlite
         /// Clear all bind vars to NULL
         void clear_bindings();
 
-        /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
+        /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a>)
 
         /// @returns C sqlite3_stmt object
         const sqlite3_stmt * get_c_obj() const;
 
-        /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a> - we don't wrap it all)
+        /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a>)
 
         /// @returns C sqlite3_stmt object
         sqlite3_stmt * get_c_obj();
