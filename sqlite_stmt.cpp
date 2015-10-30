@@ -334,6 +334,7 @@ namespace sqlite
     /// @param[in] column Column number
     /// - Unlike bind() indexes, column indexes start at 0
     /// @returns Column data for the current row
+    /// @memberof Connection::Stmt
     template<>
     std::string Connection::Stmt::get_col<std::string>(const int column)
     {
