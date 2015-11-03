@@ -126,7 +126,10 @@ namespace sqlite
         Stmt(Stmt &&) = default;
         Stmt & operator=(Stmt &&) = default;
 
+        /// @name Bind functions
+        /// Functions for binding data to SQL statements
         /// @todo TODO: bind and get remaining sqlite3 types, including const char *, possibly cast for int64_t
+        /// @{
 
         /// Bind null by index
 
@@ -140,39 +143,23 @@ namespace sqlite
         /// @param[in] index Bind variable index
         void bind(const int index);
 
-        /// Bind int var by index
+        /// Bind var by index
 
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
         /// @param[in] val Bind variable value
         void bind(const int index, const int val);
 
-        /// Bind sqlite3_int64 var by index
-
-        /// @note As in the sqlite C API, bind var indexes start at 1
-        /// @param[in] index Bind variable index
-        /// @param[in] val Bind variable value
+        /// @overload bind(const int, const int)
         void bind(const int index, const sqlite3_int64 val);
 
-        /// Bind double var by index
-
-        /// @note As in the sqlite C API, bind var indexes start at 1
-        /// @param[in] index Bind variable index
-        /// @param[in] val Bind variable value
+        /// @overload bind(const int, const int)
         void bind(const int index, const double val);
 
-        /// Bind string var by index
-
-        /// @note As in the sqlite C API, bind var indexes start at 1
-        /// @param[in] index Bind variable index
-        /// @param[in] val Bind variable value
+        /// @overload bind(const int, const int)
         void bind(const int index, const std::string & val);
 
-        /// Bind sqlite3_value var by index
-
-        /// @note As in the sqlite C API, bind var indexes start at 1
-        /// @param[in] index Bind variable index
-        /// @param[in] val Bind variable value
+        /// @overload bind(const int, const int)
         void bind(const int index, const sqlite3_value * val);
 
         /// Bind null by name
@@ -185,35 +172,25 @@ namespace sqlite
         /// @param[in] name Bind variable name
         void bind(const std::string & name);
 
-        /// Bind int var by name
+        /// Bind var by name
 
         /// @param[in] name Bind variable name
         /// @param[in] val Bind variable value
         void bind(const std::string & name, const int val);
 
-        /// Bind sqlite3_int64 var by name
-
-        /// @param[in] name Bind variable name
-        /// @param[in] val Bind variable value
+        /// @overload bind(const std::string &, const int)
         void bind(const std::string & name, const sqlite3_int64 val);
 
-        /// Bind double var by name
-
-        /// @param[in] name Bind variable name
-        /// @param[in] val Bind variable value
+        /// @overload bind(const std::string &, const int)
         void bind(const std::string & name, const double val);
 
-        /// Bind string string var by name
-
-        /// @param[in] name Bind variable name
-        /// @param[in] val Bind variable value
+        /// @overload bind(const std::string &, const int)
         void bind(const std::string & name, const std::string & val);
 
-        /// Bind sqlite3_value var by name
-
-        /// @param[in] name Bind variable name
-        /// @param[in] val Bind variable value
+        /// @overload bind(const std::string &, const int)
         void bind(const std::string & name, const sqlite3_value * val);
+
+        /// @}
 
         /// Get bind var name from index
 
@@ -234,11 +211,17 @@ namespace sqlite
         /// - \c false for UPDATE, DELETE, or database commands, or when no more rows can be SELECTED
         bool step();
 
+        /// @todo TODO: wrap remaining supported types
+        /// @todo TODO: search code for where using const char * instead of string may be more efficient
+        /// @todo TODO: create wrapper for sqlite3_value?
+
         /// Get SELECTed column
 
         /// @param[in] column Column number
         /// - Unlike bind() indexes, column indexes start at 0
         /// @returns Column data for the current row
+        /// @note Only specific template types are allowed
+        /// See documentation for template specializations.
         template<typename T>
         T get_col(const int column);
 
@@ -267,4 +250,5 @@ namespace sqlite
         sqlite3 * _db = nullptr;
     };
 };
+
 # endif // SQLITE_HPP

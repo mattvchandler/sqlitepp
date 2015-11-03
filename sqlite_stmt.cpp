@@ -55,8 +55,6 @@ namespace sqlite
         }
     }
 
-    /// @todo TODO: use grouping to tie bind and get_col together
-
     void Connection::Stmt::bind(const int index)
     {
         bind_null(index);
@@ -217,55 +215,33 @@ namespace sqlite
         }
     }
 
-    /// @todo TODO: wrap remaining supported types
+    /// @name Get columns
+    /// Get SELECTed column
+    /// @{
 
-    /// Get SELECTed column as int
-
+    /// @brief Get SELECTed column
     /// @param[in] column Column number
     /// - Unlike bind() indexes, column indexes start at 0
     /// @returns Column data for the current row
-    /// @warning Result is undefined if the statemnt does not point ot a vaild row,
-    /// or if the column index is out of range.
+
     template<>
     int Connection::Stmt::get_col<int>(const int column)
     {
         return sqlite3_column_int(_stmt, column);
     }
 
-    /// Get SELECTed column as sqlite3_int64
-
-    /// @param[in] column Column number
-    /// - Unlike bind() indexes, column indexes start at 0
-    /// @returns Column data for the current row
-    /// @warning Result is undefined if the statemnt does not point ot a vaild row,
-    /// or if the column index is out of range.
     template<>
     sqlite3_int64 Connection::Stmt::get_col<sqlite3_int64>(const int column)
     {
         return sqlite3_column_int64(_stmt, column);
     }
 
-    /// Get SELECTed column as double
-
-    /// @param[in] column Column number
-    /// - Unlike bind() indexes, column indexes start at 0
-    /// @returns Column data for the current row
-    /// @warning Result is undefined if the statemnt does not point ot a vaild row,
-    /// or if the column index is out of range.
     template<>
     double Connection::Stmt::get_col<double>(const int column)
     {
         return sqlite3_column_double(_stmt, column);
     }
 
-    /// Get SELECTed column as string
-
-    /// @param[in] column Column number
-    /// - Unlike bind() indexes, column indexes start at 0
-    /// @returns Column data for the current row
-    /// @memberof Connection::Stmt
-    /// @warning Result is undefined if the statemnt does not point ot a vaild row,
-    /// or if the column index is out of range.
     template<>
     std::string Connection::Stmt::get_col<std::string>(const int column)
     {
@@ -277,35 +253,19 @@ namespace sqlite
             return std::string(str);
     }
 
-    /// @todo TODO: search code for where using const char * instead of string may be more efficient
-
-    /// Get SELECTed column as C string
-
-    /// @param[in] column Column number
-    /// - Unlike bind() indexes, column indexes start at 0
-    /// @returns Column data for the current row
-    /// @warning Result is undefined if the statemnt does not point ot a vaild row,
-    /// or if the column index is out of range.
     template<>
     const char * Connection::Stmt::get_col<const char *>(const int column)
     {
         return reinterpret_cast<const char *>(sqlite3_column_text(_stmt, column));
     }
 
-    /// @todo TODO: create wrapper for sqlite3_value?
-
-    /// Get SELECTed column as sqlite3_value
-
-    /// @param[in] column Column number
-    /// - Unlike bind() indexes, column indexes start at 0
-    /// @returns Column data for the current row
-    /// @warning Result is undefined if the statemnt does not point ot a vaild row,
-    /// or if the column index is out of range.
     template<>
     sqlite3_value * Connection::Stmt::get_col<sqlite3_value *>(const int column)
     {
         return sqlite3_column_value(_stmt, column);
     }
+
+    /// @}
 
     void Connection::Stmt::reset()
     {
