@@ -28,8 +28,6 @@
 
 #include <sqlite3.h>
 
-/// @todo TODO: wrap entire sqlite3 library?
-
 /// Sqlite C++ wrapper and associated types
 
 /// @ingroup sqlite
@@ -148,19 +146,19 @@ namespace sqlite
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
         /// @param[in] val Bind variable value
+        void bind(const int index, const double val);
+
+        /// @overload bind(const int, const int)
         void bind(const int index, const int val);
 
         /// @overload bind(const int, const int)
         void bind(const int index, const sqlite3_int64 val);
 
         /// @overload bind(const int, const int)
-        void bind(const int index, const double val);
-
-        /// @overload bind(const int, const int)
         void bind(const int index, const std::string & val);
 
         /// @overload bind(const int, const int)
-        void bind(const int index, const sqlite3_value * val);
+        void bind(const int index, const char * val);
 
         /// Bind null by name
 
@@ -176,19 +174,19 @@ namespace sqlite
 
         /// @param[in] name Bind variable name
         /// @param[in] val Bind variable value
+        void bind(const std::string & name, const double val);
+
+        /// @overload bind(const std::string &, const int)
         void bind(const std::string & name, const int val);
 
         /// @overload bind(const std::string &, const int)
         void bind(const std::string & name, const sqlite3_int64 val);
 
         /// @overload bind(const std::string &, const int)
-        void bind(const std::string & name, const double val);
-
-        /// @overload bind(const std::string &, const int)
         void bind(const std::string & name, const std::string & val);
 
         /// @overload bind(const std::string &, const int)
-        void bind(const std::string & name, const sqlite3_value * val);
+        void bind(const std::string & name, const char * val);
 
         /// @}
 
@@ -211,7 +209,6 @@ namespace sqlite
         /// - \c false for UPDATE, DELETE, or database commands, or when no more rows can be SELECTED
         bool step();
 
-        /// @todo TODO: wrap remaining supported types
         /// @todo TODO: search code for where using const char * instead of string may be more efficient
         /// @todo TODO: create wrapper for sqlite3_value?
 

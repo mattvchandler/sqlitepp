@@ -60,6 +60,16 @@ namespace sqlite
         bind_null(index);
     }
 
+    void Connection::Stmt::bind(const int index, const double val)
+    {
+        int status = sqlite3_bind_double(_stmt, index, val);
+        if(status != SQLITE_OK)
+        {
+            throw Logic_error("Error binding index " +
+                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+        }
+    }
+
     void Connection::Stmt::bind(const int index, const int val)
     {
         int status = sqlite3_bind_int(_stmt, index, val);
@@ -80,16 +90,6 @@ namespace sqlite
         }
     }
 
-    void Connection::Stmt::bind(const int index, const double val)
-    {
-        int status = sqlite3_bind_double(_stmt, index, val);
-        if(status != SQLITE_OK)
-        {
-            throw Logic_error("Error binding index " +
-                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
-        }
-    }
-
     void Connection::Stmt::bind(const int index, const std::string & val)
     {
         int status = sqlite3_bind_text(_stmt, index, val.c_str(), val.length(), SQLITE_TRANSIENT);
@@ -100,9 +100,9 @@ namespace sqlite
         }
     }
 
-    void Connection::Stmt::bind(const int index, const sqlite3_value * val)
+    void Connection::Stmt::bind(const int index, const char * val)
     {
-        int status = sqlite3_bind_value(_stmt, index, val);
+        int status = sqlite3_bind_text(_stmt, index, val, -1, SQLITE_TRANSIENT);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding index " +
@@ -125,6 +125,16 @@ namespace sqlite
         bind_null(name);
     }
 
+    void Connection::Stmt::bind(const std::string & name, const double val)
+    {
+        int status = sqlite3_bind_double(_stmt, bind_parameter_index(name), val);
+        if(status != SQLITE_OK)
+        {
+            throw Logic_error("Error binding " + name +
+                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+        }
+    }
+
     void Connection::Stmt::bind(const std::string & name, const int val)
     {
         int status = sqlite3_bind_int(_stmt, bind_parameter_index(name), val);
@@ -145,16 +155,6 @@ namespace sqlite
         }
     }
 
-    void Connection::Stmt::bind(const std::string & name, const double val)
-    {
-        int status = sqlite3_bind_double(_stmt, bind_parameter_index(name), val);
-        if(status != SQLITE_OK)
-        {
-            throw Logic_error("Error binding " + name +
-                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
-        }
-    }
-
     void Connection::Stmt::bind(const std::string & name, const std::string & val)
     {
         int status = sqlite3_bind_text(_stmt, bind_parameter_index(name), val.c_str(), val.length(), SQLITE_TRANSIENT);
@@ -165,9 +165,9 @@ namespace sqlite
         }
     }
 
-    void Connection::Stmt::bind(const std::string & name, const sqlite3_value * val)
+    void Connection::Stmt::bind(const std::string & name, const char * val)
     {
-        int status = sqlite3_bind_value(_stmt, bind_parameter_index(name), val);
+        int status = sqlite3_bind_text(_stmt, bind_parameter_index(name), val, -1, SQLITE_TRANSIENT);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding " + name +
@@ -225,6 +225,12 @@ namespace sqlite
     /// @returns Column data for the current row
 
     template<>
+    double Connection::Stmt::get_col<double>(const int column)
+    {
+        return sqlite3_column_double(_stmt, column);
+    }
+
+    template<>
     int Connection::Stmt::get_col<int>(const int column)
     {
         return sqlite3_column_int(_stmt, column);
@@ -234,12 +240,6 @@ namespace sqlite
     sqlite3_int64 Connection::Stmt::get_col<sqlite3_int64>(const int column)
     {
         return sqlite3_column_int64(_stmt, column);
-    }
-
-    template<>
-    double Connection::Stmt::get_col<double>(const int column)
-    {
-        return sqlite3_column_double(_stmt, column);
     }
 
     template<>
@@ -257,12 +257,6 @@ namespace sqlite
     const char * Connection::Stmt::get_col<const char *>(const int column)
     {
         return reinterpret_cast<const char *>(sqlite3_column_text(_stmt, column));
-    }
-
-    template<>
-    sqlite3_value * Connection::Stmt::get_col<sqlite3_value *>(const int column)
-    {
-        return sqlite3_column_value(_stmt, column);
     }
 
     /// @}
