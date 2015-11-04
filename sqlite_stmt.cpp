@@ -45,21 +45,6 @@ namespace sqlite
         sqlite3_finalize(_stmt);
     }
 
-    void Connection::Stmt::bind_null(const int index)
-    {
-        int status = sqlite3_bind_null(_stmt, index);
-        if(status != SQLITE_OK)
-        {
-            throw Logic_error("Error binding index " +
-                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
-        }
-    }
-
-    void Connection::Stmt::bind(const int index)
-    {
-        bind_null(index);
-    }
-
     void Connection::Stmt::bind(const int index, const double val)
     {
         int status = sqlite3_bind_double(_stmt, index, val);
@@ -110,19 +95,19 @@ namespace sqlite
         }
     }
 
-    void Connection::Stmt::bind_null(const std::string & name)
+    void Connection::Stmt::bind_null(const int index)
     {
-        int status = sqlite3_bind_null(_stmt, bind_parameter_index(name));
+        int status = sqlite3_bind_null(_stmt, index);
         if(status != SQLITE_OK)
         {
-            throw Logic_error("Error binding " + name +
-                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+            throw Logic_error("Error binding index " +
+                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
         }
     }
 
-    void Connection::Stmt::bind(const std::string & name)
+    void Connection::Stmt::bind(const int index)
     {
-        bind_null(name);
+        bind_null(index);
     }
 
     void Connection::Stmt::bind(const std::string & name, const double val)
@@ -173,6 +158,21 @@ namespace sqlite
             throw Logic_error("Error binding " + name +
                 ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
         }
+    }
+
+    void Connection::Stmt::bind_null(const std::string & name)
+    {
+        int status = sqlite3_bind_null(_stmt, bind_parameter_index(name));
+        if(status != SQLITE_OK)
+        {
+            throw Logic_error("Error binding " + name +
+                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+        }
+    }
+
+    void Connection::Stmt::bind(const std::string & name)
+    {
+        bind_null(name);
     }
 
     std::string Connection::Stmt::bind_parameter_name(const int index)

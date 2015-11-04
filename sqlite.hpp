@@ -165,20 +165,7 @@ namespace sqlite
 
         /// @name Bind functions
         /// Functions for binding data to SQL statements
-        /// @todo TODO: bind and get remaining sqlite3 types, including const char *, possibly cast for int64_t
         /// @{
-
-        /// Bind null by index
-
-        /// @note As in the sqlite C API, bind var indexes start at 1
-        /// @param[in] index Bind variable index
-        void bind_null(const int index);
-
-        /// Bind null by index
-
-        /// @note As in the sqlite C API, bind var indexes start at 1
-        /// @param[in] index Bind variable index
-        void bind(const int index);
 
         /// Bind var by index
 
@@ -199,15 +186,14 @@ namespace sqlite
         /// @overload bind(const int, const int)
         void bind(const int index, const char * val);
 
-        /// Bind null by name
+        /// Bind null by index
 
-        /// @param[in] name Bind variable name
-        void bind_null(const std::string & name);
+        /// @note As in the sqlite C API, bind var indexes start at 1
+        /// @param[in] index Bind variable index
+        void bind_null(const int index);
 
-        /// Bind null by name
-
-        /// @param[in] name Bind variable name
-        void bind(const std::string & name);
+        /// @copydoc bind_null(const int)
+        void bind(const int index);
 
         /// Bind var by name
 
@@ -226,6 +212,14 @@ namespace sqlite
 
         /// @overload bind(const std::string &, const int)
         void bind(const std::string & name, const char * val);
+
+        /// Bind null by name
+
+        /// @param[in] name Bind variable name
+        void bind_null(const std::string & name);
+
+        /// @copydoc bind_null(const std::string &)
+        void bind(const std::string & name);
 
         /// @}
 
