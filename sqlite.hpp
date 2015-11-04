@@ -45,6 +45,7 @@ namespace sqlite
         /// Open / create new DB
 
         /// @param[in] filename Path to sqlite database file
+        /// @exception Runtime_error on error connecting to DB
         Connection(const std::string & filename);
         ~Connection();
 
@@ -60,6 +61,7 @@ namespace sqlite
 
         /// @param[in] sql SQL code to prepare
         /// @return Prepared statement for the SQL code input
+        /// @exception Logic_error on error parsing SQL
         Stmt create_statement(const std::string & sql);
 
         /// Execute SQL statement(s)
@@ -71,6 +73,7 @@ namespace sqlite
         /// - column_data: Array of column data (as strings) for the current row
         /// - column_names: Array of column names
         /// @param[in,out] arg Data to pass as 1st arg of callback. May be NULL.
+        /// @exception Logic_error on error evaluating SQL
         void exec(const std::string & sql, int (*callback)(void *, int, char **, char **) = nullptr,
             void * arg = nullptr);
 
@@ -152,6 +155,7 @@ namespace sqlite
         /// It is usually easier to use Connection::create_statement instead of this
         /// @param[in] sql SQL code to prepare
         /// @param[in] db Database Connection to prepare statement for
+        /// @exception Logic_error on error parsing SQL
         Stmt(const std::string & sql, Connection & db);
         ~Stmt();
 
@@ -172,6 +176,7 @@ namespace sqlite
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
         /// @param[in] val Bind variable value
+        /// @exception Logic_error on error binding
         void bind(const int index, const double val);
 
         /// @overload bind(const int, const int)
@@ -190,6 +195,7 @@ namespace sqlite
 
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
+        /// @exception Logic_error on error binding
         void bind_null(const int index);
 
         /// @copydoc bind_null(const int)
@@ -199,6 +205,7 @@ namespace sqlite
 
         /// @param[in] name Bind variable name
         /// @param[in] val Bind variable value
+        /// @exception Logic_error on error binding
         void bind(const std::string & name, const double val);
 
         /// @overload bind(const std::string &, const int)
@@ -216,6 +223,7 @@ namespace sqlite
         /// Bind null by name
 
         /// @param[in] name Bind variable name
+        /// @exception Logic_error on error binding
         void bind_null(const std::string & name);
 
         /// @copydoc bind_null(const std::string &)
@@ -227,12 +235,14 @@ namespace sqlite
 
         /// @param[in] index Bind variable index
         /// @returns Bind variable name
+        /// @exception Logic_error on error finding name
         std::string bind_parameter_name(const int index);
 
         /// Get bind var index by name
 
         /// @param[in] name Bind variable name
         /// @returns Bind variable index
+        /// @exception Logic_error on error finding index
         int bind_parameter_index(const std::string & name);
 
         /// Run the statement.
@@ -240,10 +250,9 @@ namespace sqlite
         /// @returns
         /// - \c true on SELECT statements when more rows remain to be fetched
         /// - \c false for UPDATE, DELETE, or database commands, or when no more rows can be SELECTED
+        /// @exception Logic_error on error evaluating SQL
         bool step();
 
-        /// @todo TODO: search code for where using const char * instead of string may be more efficient
-        /// @todo TODO: create wrapper for sqlite3_value?
         /// @todo TODO: link to sqlite C API reference for functions
 
         /// Get SELECTed column
@@ -259,6 +268,7 @@ namespace sqlite
         /// Reset the statement
 
         /// Useful for inserting or updating multiple rows
+        /// @exception Logic_error on error resetting
         void reset();
 
         /// Clear all bind vars to NULL
