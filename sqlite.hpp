@@ -245,6 +245,12 @@ namespace sqlite
         /// @exception Logic_error on error finding index
         int bind_parameter_index(const std::string & name);
 
+        /// Get number of bind parameters
+
+        /// @returns Number of bind parameters
+        /// @sa [C API](https://www.sqlite.org/c3ref/bind_parameter_count.html)
+        int bind_parameter_count();
+
         /// Run the statement.
 
         /// @returns

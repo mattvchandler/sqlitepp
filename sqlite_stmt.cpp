@@ -197,6 +197,11 @@ namespace sqlite
         return index;
     }
 
+    int Connection::Stmt::bind_parameter_count()
+    {
+        return sqlite3_bind_parameter_count(_stmt);
+    }
+
     bool Connection::Stmt::step()
     {
         int status = sqlite3_step(_stmt);
