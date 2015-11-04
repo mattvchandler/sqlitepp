@@ -81,6 +81,48 @@ namespace sqlite
         exec("ROLLBACK;");
     }
 
+    void Connection::interrupt()
+    {
+        sqlite3_interrupt(_db);
+    }
+
+    sqlite3_int64 Connection::last_insert_rowid()
+    {
+        return sqlite3_last_insert_rowid(_db);
+    }
+
+    int Connection::total_changes()
+    {
+        return sqlite3_total_changes(_db);
+    }
+
+    Connection::Column_metadata Connection::table_column_metadata(const std::string & table_name, const std::string & column_name,
+        const std::string db_name)
+    {
+        const char * type, * collation;
+        int not_null, primary_key, auto_inc;
+
+        int status = sqlite3_table_column_metadata(_db, db_name.c_str(), table_name.c_str(), column_name.c_str(),
+            &type, &collation, &not_null, &primary_key, &auto_inc);
+
+        if(status != SQLITE_OK)
+        {
+            sqlite3_close(_db);
+            throw Runtime_error("Error getting column info (" +
+                db_name + "." + table_name + "." + column_name + "): " +
+                sqlite3_errmsg(_db), "", status, nullptr);
+        }
+
+        return Column_metadata
+        {
+            type,
+            collation,
+            bool(not_null),
+            bool(primary_key),
+            bool(auto_inc)
+        };
+    }
+
     const sqlite3 * Connection::get_c_obj() const
     {
         return _db;

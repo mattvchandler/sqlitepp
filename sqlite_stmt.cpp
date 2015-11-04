@@ -276,6 +276,16 @@ namespace sqlite
         sqlite3_clear_bindings(_stmt);
     }
 
+    bool Connection::Stmt::busy()
+    {
+        return bool(sqlite3_stmt_busy(_stmt));
+    }
+
+    bool Connection::Stmt::readonly()
+    {
+        return bool(sqlite3_stmt_readonly(_stmt));
+    }
+
     const sqlite3_stmt * Connection::Stmt::get_c_obj() const
     {
         return _stmt;

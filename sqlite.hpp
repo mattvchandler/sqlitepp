@@ -83,12 +83,51 @@ namespace sqlite
         /// End a transaction & rollback
         void rollback();
 
-        /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a>)
+        /// Interrupt a long-running query
+        void interrupt();
+
+        /// Get last INSERTed Row ID
+
+        /// @ returns Row ID for last INSERTed row
+        sqlite3_int64 last_insert_rowid();
+
+        /// Get total number of rows modified
+
+        /// @returns Total number of rows inserted, modified or deleted by all
+        /// INSERT, UPDATE or DELETE statements completed since the database
+        /// connection was opened, including those executed as part of trigger
+        /// programs.
+        int total_changes();
+
+
+        /// Column metadata info
+
+        /// This is the return type for table_column_metadata()
+        struct Column_metadata
+        {
+            std::string type; ///< Column's declared data type
+            std::string collation; ///< Name of default collation sequence
+            bool not_null = false; ///< \c true if the column has a NOT NULL constraint
+            bool primary_key = false; ///< \c true if column is part of the PRIMARY KEY
+            bool auto_inc = false; ///< \c true True if column is AUTOINCREMENT
+        };
+
+        /// Get column metadata
+
+        /// @param[in] table_name Table name
+        /// @param[in] column_name Column name
+        /// @param[in] db_name DB name, or \c "main" if omitted
+        /// @returns The chosen column's metadata
+        /// @exception Runtime_error on error looking up info
+        Column_metadata table_column_metadata(const std::string & table_name, const std::string & column_name,
+            const std::string db_name = "main");
+
+        /// Get wrapped C sqlite3 object (for use with the sqlite [C API](https://www.sqlite.org/c3ref/intro.html))
 
         /// @returns C sqlite3 object
         const sqlite3 * get_c_obj() const;
 
-        /// Get wrapped C sqlite3 object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a>)
+        /// Get wrapped C sqlite3 object (for use with the sqlite [C API](https://www.sqlite.org/c3ref/intro.html))
 
         /// @returns C sqlite3 object
         sqlite3 * get_c_obj();
@@ -211,6 +250,7 @@ namespace sqlite
 
         /// @todo TODO: search code for where using const char * instead of string may be more efficient
         /// @todo TODO: create wrapper for sqlite3_value?
+        /// @todo TODO: link to sqlite C API reference for functions
 
         /// Get SELECTed column
 
@@ -230,15 +270,25 @@ namespace sqlite
         /// Clear all bind vars to NULL
         void clear_bindings();
 
-        /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a>)
+        /// Get wrapped C sqlite3_stmt object (for use with the sqlite [C API](https://www.sqlite.org/c3ref/intro.html))
 
         /// @returns C sqlite3_stmt object
         const sqlite3_stmt * get_c_obj() const;
 
-        /// Get wrapped C sqlite3_stmt object (for use with the sqlite <a href=https://www.sqlite.org/c3ref/intro.html>C API</a>)
+        /// Get wrapped C sqlite3_stmt object (for use with the sqlite [C API](https://www.sqlite.org/c3ref/intro.html))
 
         /// @returns C sqlite3_stmt object
         sqlite3_stmt * get_c_obj();
+
+        /// Determine if the statment has been reset
+
+        /// @returns \c true if the statement is busy (step has been called, but is not complete, nor reset)
+        bool busy();
+
+        /// Determine if the statment is read-only
+
+        /// @returns \c true if the statement does not directly write to the DB
+        bool readonly();
 
     private:
         /// Sqlite C API's prepared statement obj
