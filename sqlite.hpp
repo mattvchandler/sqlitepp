@@ -28,15 +28,19 @@
 
 #include <sqlite3.h>
 
+/// @todo TODO: separate into a library, put on Github, submodule into Hymns
+
 /// Sqlite C++ wrapper and associated types
 
 /// @ingroup sqlite
+/// @sa [C API](https://www.sqlite.org/c3ref/intro.html)
 namespace sqlite
 {
     /// Sqlite database connection
 
     /// Holds a connection to a database. SQL may be run with either the exec() method,
     /// or by using create_statement() to build a Connection::Stmt object
+    /// @sa [C API](https://www.sqlite.org/c3ref/sqlite3.html)
     class Connection final
     {
     public:
@@ -46,6 +50,7 @@ namespace sqlite
 
         /// @param[in] filename Path to sqlite database file
         /// @exception Runtime_error on error connecting to DB
+        /// @sa [C API](https://www.sqlite.org/c3ref/open.html)
         Connection(const std::string & filename);
         ~Connection();
 
@@ -62,6 +67,7 @@ namespace sqlite
         /// @param[in] sql SQL code to prepare
         /// @return Prepared statement for the SQL code input
         /// @exception Logic_error on error parsing SQL
+        /// @sa [C API](https://www.sqlite.org/c3ref/prepare.html)
         Stmt create_statement(const std::string & sql);
 
         /// Execute SQL statement(s)
@@ -74,24 +80,34 @@ namespace sqlite
         /// - column_names: Array of column names
         /// @param[in,out] arg Data to pass as 1st arg of callback. May be NULL.
         /// @exception Logic_error on error evaluating SQL
+        /// @sa [C API](https://www.sqlite.org/c3ref/exec.html)
         void exec(const std::string & sql, int (*callback)(void *, int, char **, char **) = nullptr,
             void * arg = nullptr);
 
         /// Start a transaction
+
+        /// @sa [C API](https://www.sqlite.org/lang_transaction.html)
         void begin_transaction();
 
         /// End a transaction & commit
+
+        /// @sa [C API](https://www.sqlite.org/lang_transaction.html)
         void commit();
 
         /// End a transaction & rollback
+
+        /// @sa [C API](https://www.sqlite.org/lang_transaction.html)
         void rollback();
 
         /// Interrupt a long-running query
+
+        /// @sa [C API](https://www.sqlite.org/c3ref/interrupt.html)
         void interrupt();
 
         /// Get last INSERTed Row ID
 
         /// @ returns Row ID for last INSERTed row
+        /// @sa [C API](https://www.sqlite.org/c3ref/last_insert_rowid.html)
         sqlite3_int64 last_insert_rowid();
 
         /// Get total number of rows modified
@@ -100,6 +116,7 @@ namespace sqlite
         /// INSERT, UPDATE or DELETE statements completed since the database
         /// connection was opened, including those executed as part of trigger
         /// programs.
+        /// @sa [C API](https://www.sqlite.org/c3ref/total_changes.html)
         int total_changes();
 
 
@@ -122,6 +139,7 @@ namespace sqlite
         /// @param[in] db_name DB name, or \c "main" if omitted
         /// @returns The chosen column's metadata
         /// @exception Runtime_error on error looking up info
+        /// @sa [C API](https://www.sqlite.org/c3ref/table_column_metadata.html)
         Column_metadata table_column_metadata(const std::string & table_name, const std::string & column_name,
             const std::string db_name = "main");
 
@@ -146,7 +164,8 @@ namespace sqlite
     /// to execute the statement, and then get_col() can be used to retrieve rows
     /// from a SELECT statement.
     ///
-    /// When INSERTing or UPDATing multiple rows, call reset to reuse the statement obj.
+    /// When INSERTing or UPDATing multiple rows, call reset() to reuse the statement obj.
+    /// @sa [C API](https://www.sqlite.org/c3ref/stmt.html)
     class Connection::Stmt final
     {
     public:
@@ -156,6 +175,7 @@ namespace sqlite
         /// @param[in] sql SQL code to prepare
         /// @param[in] db Database Connection to prepare statement for
         /// @exception Logic_error on error parsing SQL
+        /// @sa [C API](https://www.sqlite.org/c3ref/prepare.html)
         Stmt(const std::string & sql, Connection & db);
         ~Stmt();
 
@@ -177,6 +197,7 @@ namespace sqlite
         /// @param[in] index Bind variable index
         /// @param[in] val Bind variable value
         /// @exception Logic_error on error binding
+        /// @sa [C API](https://www.sqlite.org/c3ref/bind_blob.html)
         void bind(const int index, const double val);
 
         /// @overload bind(const int, const int)
@@ -196,6 +217,7 @@ namespace sqlite
         /// @note As in the sqlite C API, bind var indexes start at 1
         /// @param[in] index Bind variable index
         /// @exception Logic_error on error binding
+        /// @sa [C API](https://www.sqlite.org/c3ref/bind_blob.html)
         void bind_null(const int index);
 
         /// @copydoc bind_null(const int)
@@ -206,6 +228,7 @@ namespace sqlite
         /// @param[in] name Bind variable name
         /// @param[in] val Bind variable value
         /// @exception Logic_error on error binding
+        /// @sa [C API](https://www.sqlite.org/c3ref/bind_blob.html)
         void bind(const std::string & name, const double val);
 
         /// @overload bind(const std::string &, const int)
@@ -224,6 +247,7 @@ namespace sqlite
 
         /// @param[in] name Bind variable name
         /// @exception Logic_error on error binding
+        /// @sa [C API](https://www.sqlite.org/c3ref/bind_blob.html)
         void bind_null(const std::string & name);
 
         /// @copydoc bind_null(const std::string &)
@@ -236,6 +260,7 @@ namespace sqlite
         /// @param[in] index Bind variable index
         /// @returns Bind variable name
         /// @exception Logic_error on error finding name
+        /// @sa [C API](https://www.sqlite.org/c3ref/bind_parameter_name.html)
         std::string bind_parameter_name(const int index);
 
         /// Get bind var index by name
@@ -243,6 +268,7 @@ namespace sqlite
         /// @param[in] name Bind variable name
         /// @returns Bind variable index
         /// @exception Logic_error on error finding index
+        /// @sa [C API](https://www.sqlite.org/c3ref/bind_parameter_index.html)
         int bind_parameter_index(const std::string & name);
 
         /// Get number of bind parameters
@@ -257,9 +283,8 @@ namespace sqlite
         /// - \c true on SELECT statements when more rows remain to be fetched
         /// - \c false for UPDATE, DELETE, or database commands, or when no more rows can be SELECTED
         /// @exception Logic_error on error evaluating SQL
+        /// @sa [C API](https://www.sqlite.org/c3ref/step.html)
         bool step();
-
-        /// @todo TODO: link to sqlite C API reference for functions
 
         /// Get SELECTed column
 
@@ -268,6 +293,7 @@ namespace sqlite
         /// @returns Column data for the current row
         /// @note Only specific template types are allowed
         /// See documentation for template specializations.
+        /// @sa [C API](https://www.sqlite.org/c3ref/column_blob.html)
         template<typename T>
         T get_col(const int column);
 
@@ -275,10 +301,25 @@ namespace sqlite
 
         /// Useful for inserting or updating multiple rows
         /// @exception Logic_error on error resetting
+        /// @sa [C API](https://www.sqlite.org/c3ref/reset.html)
         void reset();
 
         /// Clear all bind vars to NULL
+
+        /// @sa [C API](https://www.sqlite.org/c3ref/clear_bindings.html)
         void clear_bindings();
+
+        /// Determine if the statment has been reset
+
+        /// @returns \c true if the statement is busy (step has been called, but is not complete, nor reset)
+        /// @sa [C API](https://www.sqlite.org/c3ref/stmt_busy.html)
+        bool busy();
+
+        /// Determine if the statment is read-only
+
+        /// @returns \c true if the statement does not directly write to the DB
+        /// @sa [C API](https://www.sqlite.org/c3ref/stmt_readonly.html)
+        bool readonly();
 
         /// Get wrapped C sqlite3_stmt object (for use with the sqlite [C API](https://www.sqlite.org/c3ref/intro.html))
 
@@ -289,16 +330,6 @@ namespace sqlite
 
         /// @returns C sqlite3_stmt object
         sqlite3_stmt * get_c_obj();
-
-        /// Determine if the statment has been reset
-
-        /// @returns \c true if the statement is busy (step has been called, but is not complete, nor reset)
-        bool busy();
-
-        /// Determine if the statment is read-only
-
-        /// @returns \c true if the statement does not directly write to the DB
-        bool readonly();
 
     private:
         /// Sqlite C API's prepared statement obj

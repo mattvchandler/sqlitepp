@@ -221,32 +221,32 @@ namespace sqlite
     }
 
     /// @name Get columns
-    /// Get SELECTed column
+    /// get_col() template specializations
     /// @{
 
-    /// @brief Get SELECTed column
-    /// @param[in] column Column number
-    /// - Unlike bind() indexes, column indexes start at 0
-    /// @returns Column data for the current row
-
+    /// @copydoc sqlite::Connection::Stmt::get_col()
     template<>
     double Connection::Stmt::get_col<double>(const int column)
     {
         return sqlite3_column_double(_stmt, column);
     }
 
+    /// @copydoc sqlite::Connection::Stmt::get_col()
     template<>
     int Connection::Stmt::get_col<int>(const int column)
     {
         return sqlite3_column_int(_stmt, column);
     }
 
+    /// @copydoc sqlite::Connection::Stmt::get_col()
     template<>
     sqlite3_int64 Connection::Stmt::get_col<sqlite3_int64>(const int column)
     {
         return sqlite3_column_int64(_stmt, column);
     }
 
+    /// @copydoc sqlite::Connection::Stmt::get_col()
+    /// @memberof sqlite::Connection::Stmt
     template<>
     std::string Connection::Stmt::get_col<std::string>(const int column)
     {
@@ -258,6 +258,7 @@ namespace sqlite
             return std::string(str);
     }
 
+    /// @copydoc sqlite::Connection::Stmt::get_col()
     template<>
     const char * Connection::Stmt::get_col<const char *>(const int column)
     {
