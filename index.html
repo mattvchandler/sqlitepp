@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Sqlitepp
-   &#160;<span id="projectnumber">1.0.1</span>
+   &#160;<span id="projectnumber">1.0.4</span>
    </div>
    <div id="projectbrief">A thin sqlite C++ wrapper</div>
   </td>
@@ -40,6 +40,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -81,7 +82,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Sqlitepp Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The library is split into 4 modules:</p>
+<div class="textblock"><p>Sqlitepp is a simple wrapper for <a href="https://www.sqlite.org">sqlite</a>. It simply adds RAII to the most commonly used sqlite types and a few convenience methods for their most used functionality. Sqlitepp types have a get_c_obj() method to gain access to the underlying sqlite type, which allows you to use any part of the sqlite C library not wrapped by sqlitepp. That way you can take advantage of sqlitepp without losing any functionality.</p>
+<h3><a href="https://github.com/mattvchandler/sqlitepp">Sqlitepp on Github</a></h3>
+<h3><a href="https://mattvchandler.github.io/sqlitepp/index.html">Documentation</a></h3>
+<h2>Structure</h2>
+<p>The library is split into 4 modules:</p>
 <h3><a class="el" href="classsqlite_1_1_connection.html" title="Sqlite database connection. ">sqlite::Connection</a> (corresponds to sqlite's <a href="https://www.sqlite.org/c3ref/sqlite3.html">sqlite3</a> type)</h3>
 <p>Represents the sqlite database connection itself.</p>
 <h3><a class="el" href="classsqlite_1_1_connection_1_1_stmt.html" title="Prepared statement obj - usually created by Connection::create_statement. ">sqlite::Connection::Stmt</a> (corresponds to sqlite's <a href="https://www.sqlite.org/c3ref/stmt.html">sqlite3_stmt</a> type)</h3>
@@ -96,17 +101,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>Sqlite</li>
 </ul>
 <p>Sqlitepp uses CMake to build: </p><pre class="fragment">$ mkdir build &amp;&amp; cd build
-$ cmake -DCMAKE_INSTALL_PREFIX=&lt;prefix path&gt; ..
+$ cmake .. -DCMAKE_INSTALL_PREFIX=&lt;prefix path&gt; # add -DBUILD_SHARED_LIBS for a shared libary
 $ make
 # make install
 </pre><h4>Debian &amp; derivatives</h4>
 <p>Sqlitepp is configured to generate a .deb package file. To do so, substitute the above with the following: </p><pre class="fragment">$ mkdir build &amp;&amp; cd build
-$ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+$ cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS
 $ make
 $ cpack
 # dpkg -i libsqlitepp-dev*.deb
-</pre><h4>Documentation</h4>
-<p>If doxygen is installed, library documentation can be generated with: <code>$ make doc</code> </p>
+</pre><p>When linking your own code using sqlitepp, you will need to link to both the sqlitepp and sqlite3 libraries: <code>-l sqlitepp -lsqlite3</code> (depending on your OS)</p>
+<h4>Documentation</h4>
+<p>If doxygen is installed, library documentation can be generated with: <code>$ make doc</code></p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd><ul>
+<li>Add CMake find file and pkg-config file</li>
+<li>Add option to statically link to / compile in sqlite </li>
+</ul>
+</dd></dl>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
