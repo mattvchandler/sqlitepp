@@ -20,21 +20,8 @@ endif()
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(SQLITE sqlite3 REQUIRED)
 
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    add_custom_command(
-        OUTPUT ${PROJECT_BINARY_DIR}/doc/html/index.html
-        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-        DEPENDS ${PROJECT_BINARY_DIR}/Doxyfile
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/README.md
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*
-        COMMENT "Generating documentation with Doxygen")
-
-    add_custom_target(doc DEPENDS ${PROJECT_BINARY_DIR}/doc/html/index.html)
-
-    set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES doc)
-endif()
+set(SQLITEPP_GEN_DOC_TARGET ON CACHE BOOL "Generate 'doc' target")
+set(SQLITEPP_GIT_VERSIONING ON CACHE BOOL "Get version info from git")
 
 # directories
 include_directories(
@@ -45,8 +32,28 @@ link_directories(
     ${SQLITE_LIBRARY_DIRS}
     )
 
+if(SQLITEPP_GEN_DOC_TARGET)
+    find_package(Doxygen)
+    if(DOXYGEN_FOUND)
+        add_custom_command(
+            OUTPUT ${PROJECT_BINARY_DIR}/doc/html/index.html
+            COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+            DEPENDS ${PROJECT_BINARY_DIR}/Doxyfile
+            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/README.md
+            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*
+            COMMENT "Generating documentation with Doxygen")
+
+        add_custom_target(doc DEPENDS ${PROJECT_BINARY_DIR}/doc/html/index.html)
+
+        set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES doc)
+    endif()
+endif()
+
 # git version info
-find_package(Git)
+if(SQLITEPP_GIT_VERSIONING)
+    find_package(Git)
+endif()
 if(GIT_FOUND)
     file(GENERATE OUTPUT ${PROJECT_BINARY_DIR}/version.cmake CONTENT
         "# copy vars from main CMakeLists.txt
@@ -124,6 +131,8 @@ else()
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
         ${PROJECT_BINARY_DIR}/Doxyfile)
 endif()
+
+# TODO: add option to statically link to sqlite / download the file && compile it in
 
 # main compilation
 add_library(${PROJECT_NAME}
