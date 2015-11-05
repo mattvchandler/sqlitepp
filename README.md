@@ -45,7 +45,7 @@ above with the following:
     $ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
     $ make
     $ cpack
-    # dpkg -i libsqlitepp*.deb
+    # dpkg -i libsqlitepp-dev*.deb
 
 #### Documentation
 If doxygen is installed, library documentation can be generated with: `$ make doc`
