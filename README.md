@@ -24,4 +24,28 @@ A simple [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern
 object for use with Connection. This is provided as a convinence, and is not
 required to use the rest of the library.
 
-@todo Add build and install documentation
+## Building & Installation
+
+### Dependencies
+
+* Sqlite
+
+Sqlitepp uses CMake to build:
+
+    $ mkdir build && cd build
+    $ cmake -DCMAKE_INSTALL_PREFIX=<prefix path> ..
+    $ make
+    # make install
+
+#### Debian & derivatives
+Sqlitepp is configured to generate a .deb package file. To do so, substitute the
+above with the following:
+
+    $ mkdir build && cd build
+    $ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    $ make
+    $ cpack
+    # dpkg -i libsqlitepp*.deb
+
+#### Documentation
+If doxygen is installed, library documentation can be generated with: `$ make doc`
