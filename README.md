@@ -23,3 +23,5 @@ std::runtime_error and std::logic_error, respectively.
 A simple [service locator](https://en.wikipedia.org/wiki/Service_locator_pattern)
 object for use with Connection. This is provided as a convinence, and is not
 required to use the rest of the library.
+
+@todo Add build and install documentation

@@ -24,7 +24,7 @@
 #ifndef DATABSE_HPP
 #define DATABSE_HPP
 
-#include "sqlite/sqlite.hpp"
+#include "sqlite.hpp"
 
 /// @ingroup sqlite
 namespace sqlite

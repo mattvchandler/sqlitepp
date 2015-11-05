@@ -1,5 +1,4 @@
-/// @file
-/// @brief Exception types for sqlite errors
+// Exception types for sqlite errors
 
 // Copyright 2015 Matthew Chandler
 
@@ -21,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "sqlite/sqlite_error.hpp"
+#include <sqlitepp/sqlite_error.hpp>
 
 namespace sqlite
 {

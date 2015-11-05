@@ -1,5 +1,4 @@
-/// @file
-/// @brief Sqlite library wrapper
+// Sqlite library wrapper
 
 // Copyright 2015 Matthew Chandler
 
@@ -21,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "sqlite/sqlite.hpp"
+#include <sqlitepp/sqlite.hpp>
 
-#include "sqlite/sqlite_error.hpp"
+#include <sqlitepp/sqlite_error.hpp>
 
 namespace sqlite
 {

@@ -28,8 +28,6 @@
 
 #include <sqlite3.h>
 
-/// @todo TODO: separate into a library, put on Github, submodule into Hymns
-
 /// Sqlite C++ wrapper and associated types
 
 /// @ingroup sqlite

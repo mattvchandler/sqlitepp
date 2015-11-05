@@ -1,5 +1,4 @@
-/// @file
-/// @brief Service locator for database
+// Service locator for database
 
 // Copyright 2015 Matthew Chandler
 
@@ -21,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "sqlite/database.hpp"
+#include <sqlitepp/database.hpp>
 
 #include <stdexcept>
 
