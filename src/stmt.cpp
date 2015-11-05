@@ -22,7 +22,7 @@
 
 #include <sqlitepp/sqlite.hpp>
 
-#include <sqlitepp/sqlite_error.hpp>
+#include <sqlitepp/error.hpp>
 
 using namespace std::string_literals;
 

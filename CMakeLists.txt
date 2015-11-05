@@ -138,8 +138,8 @@ endif()
 add_library(${PROJECT_NAME}
     src/database.cpp
     src/sqlite.cpp
-    src/sqlite_error.cpp
-    src/sqlite_stmt.cpp
+    src/error.cpp
+    src/stmt.cpp
     )
 
 target_link_libraries(${PROJECT_NAME}
