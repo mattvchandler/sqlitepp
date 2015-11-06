@@ -26,7 +26,7 @@
 
 #include <string>
 
-#include <sqlite3.h>
+#include <sqlitepp/sqlite3.h>
 
 /// Sqlite C++ wrapper and associated types
 

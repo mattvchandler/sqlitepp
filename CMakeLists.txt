@@ -17,20 +17,69 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # libraries
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(SQLITE sqlite3 REQUIRED)
-
 set(SQLITEPP_GEN_DOC_TARGET ON CACHE BOOL "Generate 'doc' target")
 set(SQLITEPP_GIT_VERSIONING ON CACHE BOOL "Get version info from git")
+set(INCLUDE_SQLITE OFF CACHE BOOL "Download and include sqlite3 (removes dependency on external sqlite library)")
 
-# directories
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/
-    ${SQLITE_INCLUDE_DIRS}
-    )
-link_directories(
-    ${SQLITE_LIBRARY_DIRS}
-    )
+if(INCLUDE_SQLITE)
+    find_package(Threads REQUIRED)
+
+    set(SQLITE_VERSION_STR "3090200")
+    set(SQLITE_ARCHIVE_NAME "sqlite-amalgamation-${SQLITE_VERSION_STR}")
+
+    file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/get_sqlite.cmake" CONTENT
+        "file(DOWNLOAD
+        https://www.sqlite.org/2015/${SQLITE_ARCHIVE_NAME}.zip
+            \"${PROJECT_BINARY_DIR}/${SQLITE_ARCHIVE_NAME}.zip\"
+            SHOW_PROGRESS)
+
+        execute_process(COMMAND \${CMAKE_COMMAND} -E tar xf
+            \"${PROJECT_BINARY_DIR}/${SQLITE_ARCHIVE_NAME}.zip\"
+            )
+
+        file(COPY \"${PROJECT_BINARY_DIR}/${SQLITE_ARCHIVE_NAME}/sqlite3.h\"
+            DESTINATION \"${PROJECT_BINARY_DIR}/include/sqlitepp/\")\n")
+
+    add_custom_command(OUTPUT "${PROJECT_BINARY_DIR}/${SQLITE_ARCHIVE_NAME}/sqlite3.c"
+        COMMAND ${CMAKE_COMMAND} -P "${PROJECT_BINARY_DIR}/get_sqlite.cmake"
+        COMMENT "Getting sqlite source code")
+
+    add_custom_target(get_sqlite
+        DEPENDS "${PROJECT_BINARY_DIR}/${SQLITE_ARCHIVE_NAME}/sqlite3.c")
+
+    include_directories(
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+        "${PROJECT_BINARY_DIR}/include"
+        )
+    set(SOURCES
+        "${PROJECT_BINARY_DIR}/${SQLITE_ARCHIVE_NAME}/sqlite3.c"
+        src/database.cpp
+        src/sqlite.cpp
+        src/error.cpp
+        src/stmt.cpp
+        )
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SQLITE sqlite3 REQUIRED)
+
+    file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/include/sqlitepp/sqlite3.h"
+        CONTENT "#include <sqlite3.h>")
+
+    include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/
+        ${SQLITE_INCLUDE_DIRS}
+        "${PROJECT_BINARY_DIR}/include"
+        )
+    link_directories(
+        ${SQLITE_LIBRARY_DIRS}
+        )
+    set(SOURCES
+        src/database.cpp
+        src/sqlite.cpp
+        src/error.cpp
+        src/stmt.cpp
+        )
+endif()
 
 if(SQLITEPP_GEN_DOC_TARGET)
     find_package(Doxygen)
@@ -122,7 +171,7 @@ if(GIT_FOUND)
 else()
     # manually update each minor release
     set(VERSION_MAJOR 1)
-    set(VERSION_MINOR 4)
+    set(VERSION_MINOR 1)
     set(VERSION_PATCH 0)
     set(VERSION_SHA1 "")
     set(VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
@@ -132,19 +181,24 @@ else()
         ${PROJECT_BINARY_DIR}/Doxyfile)
 endif()
 
-# TODO: add option to statically link to sqlite / download the file && compile it in
-
 # main compilation
 add_library(${PROJECT_NAME}
-    src/database.cpp
-    src/sqlite.cpp
-    src/error.cpp
-    src/stmt.cpp
+    ${SOURCES}
     )
 
-target_link_libraries(${PROJECT_NAME}
-    ${SQLITE_LIBRARIES}
-    )
+if(INCLUDE_SQLITE)
+    add_dependencies(${PROJECT_NAME}
+        get_sqlite)
+
+    target_link_libraries(${PROJECT_NAME}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${CMAKE_DL_LIBS}
+        )
+else()
+    target_link_libraries(${PROJECT_NAME}
+        ${SQLITE_LIBRARIES}
+        )
+endif()
 
 # install targets
 install(TARGETS ${PROJECT_NAME}
@@ -154,6 +208,7 @@ install(TARGETS ${PROJECT_NAME}
     )
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}" DESTINATION "include")
+install(DIRECTORY "${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}" DESTINATION "include")
 
 # CPack vars
 set(CPACK_GENERATOR TGZ)
@@ -184,8 +239,12 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         execute_process(COMMAND ${DPKG} --print-architecture
             OUTPUT_STRIP_TRAILING_WHITESPACE
             OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS
-            "libsqlite3-0")
+        if(NOT INCLUDE_SQLITE)
+            set(CPACK_DEBIAN_PACKAGE_DEPENDS
+                "libsqlite3-0")
+        else()
+            set(CPACK_DEBIAN_PACKAGE_DEPENDS "")
+        endif()
         set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
         string(TOLOWER "${CPACK_PACKAGE_NAME}" CPACK_DEBIAN_PACKAGE_NAME)
         set(CPACK_PACKAGE_FILE_NAME

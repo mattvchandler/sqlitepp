@@ -27,7 +27,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <sqlite3.h>
+#include <sqlitepp/sqlite3.h>
 
 /// @ingroup sqlite
 namespace sqlite

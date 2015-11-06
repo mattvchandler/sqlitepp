@@ -68,4 +68,3 @@ If doxygen is installed, library documentation can be generated with: `$ make do
 
 @todo
 * Add CMake find file and pkg-config file
-* Add option to statically link to / compile in sqlite
