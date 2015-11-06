@@ -10,7 +10,6 @@ set(WEBSITE "http://github.com/mattvchandler/sqlitepp")
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -std=c++14")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
@@ -63,7 +62,7 @@ else()
     pkg_check_modules(SQLITE sqlite3 REQUIRED)
 
     file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/include/sqlitepp/sqlite3.h"
-        CONTENT "#include <sqlite3.h>")
+        CONTENT "#include <sqlite3.h>\n")
 
     include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/include/
