@@ -147,9 +147,13 @@ target_link_libraries(${PROJECT_NAME}
     )
 
 # install targets
-install(TARGETS "${PROJECT_NAME}" DESTINATION "lib")
+install(TARGETS ${PROJECT_NAME}
+    ARCHIVE DESTINATION "lib"
+    LIBRARY DESTINATION "lib"
+    RUNTIME DESTINATION "bin"
+    )
 
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/sqlitepp" DESTINATION "include")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}" DESTINATION "include")
 
 # CPack vars
 set(CPACK_GENERATOR TGZ)
