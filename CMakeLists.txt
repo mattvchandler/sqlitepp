@@ -16,9 +16,13 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # libraries
-set(SQLITEPP_GEN_DOC_TARGET ON CACHE BOOL "Generate 'doc' target")
-set(SQLITEPP_GIT_VERSIONING ON CACHE BOOL "Get version info from git")
-set(INCLUDE_SQLITE OFF CACHE BOOL "Download and include sqlite3 (removes dependency on external sqlite library)")
+option(SQLITEPP_GEN_DOC_TARGET "Generate 'doc' target" ON)
+option(SQLITEPP_GIT_VERSIONING "Get version info from git" ON)
+
+option(INCLUDE_SQLITE "Download and include sqlite3 (removes dependency on external sqlite library)" OFF)
+
+option(DISABLE_SHARED_LIBS "Disable building of static library" OFF)
+option(DISABLE_STATIC_LIBS "Disable building of shared library" OFF)
 
 if(INCLUDE_SQLITE)
     find_package(Threads REQUIRED)
@@ -122,7 +126,7 @@ if(GIT_FOUND)
 
         set(VERSION_SHORT \"\${VERSION_MAJOR}.\${VERSION_MINOR}.\${VERSION_PATCH}\")
 
-        message(STATUS \"Hymns version \${VERSION_FULL}\")
+        message(STATUS \"${PROJECT_TITLE} version \${VERSION_FULL}\")
 
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
             ${PROJECT_BINARY_DIR}/Doxyfile
@@ -204,32 +208,50 @@ else()
 endif()
 
 # main compilation
-# add_library(${PROJECT_NAME} SHARED ${SOURCES})
 add_library(${PROJECT_NAME}_obj OBJECT ${SOURCES})
 set_target_properties(${PROJECT_NAME}_obj PROPERTIES POSITION_INDEPENDENT_CODE 1)
 
-add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:${PROJECT_NAME}_obj>)
-add_library(${PROJECT_NAME}-static STATIC $<TARGET_OBJECTS:${PROJECT_NAME}_obj>)
+set(SHARED_LIBS ${PROJECT_NAME})
+set(STATIC_LIBS ${PROJECT_NAME}-static)
+set(TARGETS ${SHARED_LIBS} ${STATIC_LIBS})
+
+if(DISABLE_STATIC_LIBS AND DISABLE_SHARED_LIBS)
+    message(FATAL_ERROR "Both static and shared libs disabled - nothing to do!")
+endif()
+if(DISABLE_SHARED_LIBS)
+    set(STATIC_LIBS ${SHARED_LIBS})
+    unset(SHARED_LIBS)
+    set(TARGETS ${STATIC_LIBS})
+endif()
+if(DISABLE_STATIC_LIBS)
+    unset(STATIC_LIBS)
+    set(TARGETS ${SHARED_LIBS})
+endif()
+
+if(NOT DISABLE_SHARED_LIBS)
+    add_library(${SHARED_LIBS} SHARED $<TARGET_OBJECTS:${PROJECT_NAME}_obj>)
+endif()
+
+if(NOT DISABLE_STATIC_LIBS)
+    add_library(${STATIC_LIBS} STATIC $<TARGET_OBJECTS:${PROJECT_NAME}_obj>)
+endif()
 
 if(INCLUDE_SQLITE)
     add_dependencies(${PROJECT_NAME}_obj
         get_sqlite)
 
-    target_link_libraries(${PROJECT_NAME}
-        ${CMAKE_THREAD_LIBS_INIT}
-        ${CMAKE_DL_LIBS}
-        )
-    target_link_libraries(${PROJECT_NAME}-static
-        ${CMAKE_THREAD_LIBS_INIT}
-        ${CMAKE_DL_LIBS}
-        )
+    foreach(TARGET ${TARGETS})
+        target_link_libraries(${TARGET}
+            ${CMAKE_THREAD_LIBS_INIT}
+            ${CMAKE_DL_LIBS}
+            )
+    endforeach()
 else()
-    target_link_libraries(${PROJECT_NAME}
+    foreach(TARGET ${TARGETS})
+        target_link_libraries(${TARGET}
         ${SQLITE_LIBRARIES}
         )
-    target_link_libraries(${PROJECT_NAME}-static
-        ${SQLITE_LIBRARIES}
-        )
+    endforeach()
 endif()
 
 if(GIT_FOUND)
@@ -237,7 +259,7 @@ if(GIT_FOUND)
 endif()
 
 # install targets
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}-static
+install(TARGETS ${TARGETS}
     EXPORT "${PROJECT_NAME}-targets"
     ARCHIVE DESTINATION "lib"
     LIBRARY DESTINATION "lib"
