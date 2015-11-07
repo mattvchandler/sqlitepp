@@ -65,6 +65,3 @@ sqlitepp and sqlite3 libraries: `-l sqlitepp -lsqlite3` (depending on your OS)
 
 #### Documentation
 If doxygen is installed, library documentation can be generated with: `$ make doc`
-
-@todo
-* Add CMake find file and pkg-config file

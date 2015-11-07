@@ -1,0 +1,2 @@
+include("@CMAKE_INSTALL_PREFIX@/lib/cmake/sqlitepp/sqlitepp-targets.cmake")
+get_filename_component(SQLITEPP_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include/sqlitepp" ABSOLUTE)

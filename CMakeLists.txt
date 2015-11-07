@@ -37,7 +37,7 @@ if(INCLUDE_SQLITE)
             )
 
         file(COPY \"${PROJECT_BINARY_DIR}/${SQLITE_ARCHIVE_NAME}/sqlite3.h\"
-            DESTINATION \"${PROJECT_BINARY_DIR}/include/sqlitepp/\")\n")
+            DESTINATION \"${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/\")\n")
 
     add_custom_command(OUTPUT "${PROJECT_BINARY_DIR}/${SQLITE_ARCHIVE_NAME}/sqlite3.c"
         COMMAND ${CMAKE_COMMAND} -P "${PROJECT_BINARY_DIR}/get_sqlite.cmake"
@@ -61,7 +61,7 @@ else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(SQLITE sqlite3 REQUIRED)
 
-    file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/include/sqlitepp/sqlite3.h"
+    file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/sqlite3.h"
         CONTENT "#include <sqlite3.h>\n")
 
     include_directories(
@@ -104,17 +104,7 @@ if(SQLITEPP_GIT_VERSIONING)
 endif()
 if(GIT_FOUND)
     file(GENERATE OUTPUT ${PROJECT_BINARY_DIR}/version.cmake CONTENT
-        "# copy vars from main CMakeLists.txt
-        set(CMAKE_CURRENT_SOURCE_DIR \"${CMAKE_CURRENT_SOURCE_DIR}\")
-        set(PROJECT_BINARY_DIR \"${PROJECT_BINARY_DIR}\")
-        set(PROJECT_NAME \"${PROJECT_NAME}\")
-        set(TITLE \"${TITLE}\")
-        set(AUTHOR \"${AUTHOR}\")
-        set(COPYRIGHT \"${COPYRIGHT}\")
-        set(SUMMARY \"${SUMMARY}\")
-        set(WEBSITE \"${WEBSITE}\")
-
-        execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --dirty
+        "execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --dirty
             OUTPUT_STRIP_TRAILING_WHITESPACE
             OUTPUT_VARIABLE VERSION_FULL)
 
@@ -135,13 +125,37 @@ if(GIT_FOUND)
         message(STATUS \"Hymns version \${VERSION_FULL}\")
 
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
-            ${PROJECT_BINARY_DIR}/Doxyfile)\n")
+            ${PROJECT_BINARY_DIR}/Doxyfile
+            @ONLY)
+
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake.in
+            ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+            @ONLY)
+
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config-version.cmake.in
+            ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+            @ONLY)
+
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
+            ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
+            @ONLY)\n")
 
     add_custom_target(version
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/version.cmake
+        COMMAND ${CMAKE_COMMAND}
+        -D PROJECT_NAME="\"${PROJECT_NAME}\""
+        -D TITLE="\"${TITLE}\""
+        -D SUMMARY="\"${SUMMARY}\""
+        -D CMAKE_INSTALL_PREFIX="\"${CMAKE_INSTALL_PREFIX}\""
+        -P ${CMAKE_BINARY_DIR}/version.cmake
         DEPENDS
+            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config-version.cmake.in
             ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
         BYPRODUCTS
+            ${PROJECT_BIBARY_DIR}/${PROJECT_NAME}.pc
+            ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+            ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
             ${PROJECT_BINARY_DIR}/Doxyfile
         COMMENT "Getting version from git"
         )
@@ -177,42 +191,54 @@ else()
     set(VERSION_FULL "${VERSION_SHORT}")
 
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
-        ${PROJECT_BINARY_DIR}/Doxyfile)
+        ${PROJECT_BINARY_DIR}/Doxyfile
+        @ONLY)
+
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake.in
+        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+        @ONLY)
+
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
+        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
+        @ONLY)
 endif()
 
 # main compilation
+# add_library(${PROJECT_NAME} SHARED ${SOURCES})
 add_library(${PROJECT_NAME}_obj OBJECT ${SOURCES})
 set_target_properties(${PROJECT_NAME}_obj PROPERTIES POSITION_INDEPENDENT_CODE 1)
 
-add_library(${PROJECT_NAME}_STATIC STATIC $<TARGET_OBJECTS:${PROJECT_NAME}_obj>)
-add_library(${PROJECT_NAME}_SHARED SHARED $<TARGET_OBJECTS:${PROJECT_NAME}_obj>)
-
-set_target_properties(${PROJECT_NAME}_STATIC PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-set_target_properties(${PROJECT_NAME}_SHARED PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:${PROJECT_NAME}_obj>)
+add_library(${PROJECT_NAME}-static STATIC $<TARGET_OBJECTS:${PROJECT_NAME}_obj>)
 
 if(INCLUDE_SQLITE)
     add_dependencies(${PROJECT_NAME}_obj
         get_sqlite)
 
-    target_link_libraries(${PROJECT_NAME}_STATIC
+    target_link_libraries(${PROJECT_NAME}
         ${CMAKE_THREAD_LIBS_INIT}
         ${CMAKE_DL_LIBS}
         )
-    target_link_libraries(${PROJECT_NAME}_SHARED
+    target_link_libraries(${PROJECT_NAME}-static
         ${CMAKE_THREAD_LIBS_INIT}
         ${CMAKE_DL_LIBS}
         )
 else()
-    target_link_libraries(${PROJECT_NAME}_STATIC
+    target_link_libraries(${PROJECT_NAME}
         ${SQLITE_LIBRARIES}
         )
-    target_link_libraries(${PROJECT_NAME}_SHARED
+    target_link_libraries(${PROJECT_NAME}-static
         ${SQLITE_LIBRARIES}
         )
 endif()
 
+if(GIT_FOUND)
+    add_dependencies(${PROJECT_NAME}_obj version)
+endif()
+
 # install targets
-install(TARGETS ${PROJECT_NAME}_STATIC ${PROJECT_NAME}_SHARED
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}-static
+    EXPORT "${PROJECT_NAME}-targets"
     ARCHIVE DESTINATION "lib"
     LIBRARY DESTINATION "lib"
     RUNTIME DESTINATION "bin"
@@ -221,11 +247,17 @@ install(TARGETS ${PROJECT_NAME}_STATIC ${PROJECT_NAME}_SHARED
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}" DESTINATION "include")
 install(DIRECTORY "${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}" DESTINATION "include")
 
+install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake" DESTINATION "lib/cmake/${PROJECT_NAME}")
+install(EXPORT "${PROJECT_NAME}-targets" DESTINATION "lib/cmake/${PROJECT_NAME}")
+install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake" DESTINATION "lib/cmake/${PROJECT_NAME}")
+
+install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc" DESTINATION "share/pkgconfig")
+
 # CPack vars
 set(CPACK_GENERATOR TGZ)
 set(CPACK_PACKAGE_CONTACT "${AUTHOR}")
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY)
-set(CPACK_PACKAGE_NAME "libsqlitepp-dev")
+set(CPACK_PACKAGE_NAME "lib${PROJECT_NAME}-dev")
 set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
