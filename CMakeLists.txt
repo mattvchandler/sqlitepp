@@ -181,26 +181,38 @@ else()
 endif()
 
 # main compilation
-add_library(${PROJECT_NAME}
-    ${SOURCES}
-    )
+add_library(${PROJECT_NAME}_obj OBJECT ${SOURCES})
+set_target_properties(${PROJECT_NAME}_obj PROPERTIES POSITION_INDEPENDENT_CODE 1)
+
+add_library(${PROJECT_NAME}_STATIC STATIC $<TARGET_OBJECTS:${PROJECT_NAME}_obj>)
+add_library(${PROJECT_NAME}_SHARED SHARED $<TARGET_OBJECTS:${PROJECT_NAME}_obj>)
+
+set_target_properties(${PROJECT_NAME}_STATIC PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+set_target_properties(${PROJECT_NAME}_SHARED PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
 if(INCLUDE_SQLITE)
-    add_dependencies(${PROJECT_NAME}
+    add_dependencies(${PROJECT_NAME}_obj
         get_sqlite)
 
-    target_link_libraries(${PROJECT_NAME}
+    target_link_libraries(${PROJECT_NAME}_STATIC
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${CMAKE_DL_LIBS}
+        )
+    target_link_libraries(${PROJECT_NAME}_SHARED
         ${CMAKE_THREAD_LIBS_INIT}
         ${CMAKE_DL_LIBS}
         )
 else()
-    target_link_libraries(${PROJECT_NAME}
+    target_link_libraries(${PROJECT_NAME}_STATIC
+        ${SQLITE_LIBRARIES}
+        )
+    target_link_libraries(${PROJECT_NAME}_SHARED
         ${SQLITE_LIBRARIES}
         )
 endif()
 
 # install targets
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME}_STATIC ${PROJECT_NAME}_SHARED
     ARCHIVE DESTINATION "lib"
     LIBRARY DESTINATION "lib"
     RUNTIME DESTINATION "bin"
