@@ -126,7 +126,7 @@ if(GIT_FOUND)
 
         set(VERSION_SHORT \"\${VERSION_MAJOR}.\${VERSION_MINOR}.\${VERSION_PATCH}\")
 
-        message(STATUS \"${PROJECT_TITLE} version \${VERSION_FULL}\")
+        message(STATUS \"${TITLE} version \${VERSION_FULL}\")
 
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
             ${PROJECT_BINARY_DIR}/Doxyfile
