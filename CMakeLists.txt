@@ -108,7 +108,7 @@ if(SQLITEPP_GIT_VERSIONING)
 endif()
 if(GIT_FOUND)
     file(GENERATE OUTPUT ${PROJECT_BINARY_DIR}/version.cmake CONTENT
-        "execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --dirty
+        "execute_process(COMMAND \"${GIT_EXECUTABLE}\" describe --tags --dirty
             OUTPUT_STRIP_TRAILING_WHITESPACE
             OUTPUT_VARIABLE VERSION_FULL)
 
