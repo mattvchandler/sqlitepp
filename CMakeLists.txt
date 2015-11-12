@@ -6,10 +6,9 @@ set(COPYRIGHT "2015 Matthew Chandler")
 set(SUMMARY "A thin sqlite C++ wrapper")
 set(WEBSITE "http://github.com/mattvchandler/sqlitepp")
 
-#flags
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -std=c++14")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_compile_options(-Wall -Wextra)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
