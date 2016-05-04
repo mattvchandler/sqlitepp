@@ -112,14 +112,14 @@ namespace sqlite
                 sqlite3_errmsg(_db), "", status, nullptr);
         }
 
-        return Column_metadata
-        {
-            type,
-            collation,
-            bool(not_null),
-            bool(primary_key),
-            bool(auto_inc)
-        };
+        Column_metadata ret;
+        ret.type = type;
+        ret.collation = collation;
+        ret.not_null = bool(not_null);
+        ret.primary_key = bool(primary_key);
+        ret.auto_inc = bool(auto_inc);
+
+        return ret;
     }
 
     const sqlite3 * Connection::get_c_obj() const
