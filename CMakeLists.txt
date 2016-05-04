@@ -125,6 +125,12 @@ if(GIT_FOUND)
 
         set(VERSION_SHORT \"\${VERSION_MAJOR}.\${VERSION_MINOR}.\${VERSION_PATCH}\")
 
+        set(PROJECT_NAME \"${PROJECT_NAME}\")
+        set(TITLE \"${TITLE}\")
+        set(SUMMARY \"${SUMMARY}\")
+        set(CMAKE_INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
+        set(CMAKE_CURRENT_SOURCE_DIR  \"${CMAKE_CURRENT_SOURCE_DIR}\")
+
         message(STATUS \"${TITLE} version \${VERSION_FULL}\")
 
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
@@ -145,10 +151,6 @@ if(GIT_FOUND)
 
     add_custom_target(version
         COMMAND ${CMAKE_COMMAND}
-        -D PROJECT_NAME="\"${PROJECT_NAME}\""
-        -D TITLE="\"${TITLE}\""
-        -D SUMMARY="\"${SUMMARY}\""
-        -D CMAKE_INSTALL_PREFIX="\"${CMAKE_INSTALL_PREFIX}\""
         -P ${CMAKE_BINARY_DIR}/version.cmake
         DEPENDS
             ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
