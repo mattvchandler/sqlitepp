@@ -96,7 +96,7 @@ namespace sqlite
     }
 
     Connection::Column_metadata Connection::table_column_metadata(const std::string & table_name, const std::string & column_name,
-        const std::string db_name)
+        const std::string & db_name)
     {
         const char * type, * collation;
         int not_null, primary_key, auto_inc;

@@ -139,7 +139,7 @@ namespace sqlite
         /// @exception Runtime_error on error looking up info
         /// @sa [C API](https://www.sqlite.org/c3ref/table_column_metadata.html)
         Column_metadata table_column_metadata(const std::string & table_name, const std::string & column_name,
-            const std::string db_name = "main");
+            const std::string & db_name = "main");
 
         /// Get wrapped C sqlite3 object (for use with the sqlite [C API](https://www.sqlite.org/c3ref/intro.html))
 
