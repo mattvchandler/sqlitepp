@@ -1,4 +1,4 @@
-# Sqlitepp - a thin C++ wrapper library for [Sqlite](https://www.sqlite.org/)
+# Sqlitepp - a thin C++ wrapper library for Sqlite
 
 Sqlitepp is a simple wrapper for [sqlite](https://www.sqlite.org). It simply
 adds RAII to the most commonly used sqlite types and a few convenience methods
