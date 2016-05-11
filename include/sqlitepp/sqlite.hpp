@@ -49,7 +49,7 @@ namespace sqlite
         /// @param[in] filename Path to sqlite database file
         /// @exception Runtime_error on error connecting to DB
         /// @sa [C API](https://www.sqlite.org/c3ref/open.html)
-        Connection(const std::string & filename);
+        explicit Connection(const std::string & filename);
         ~Connection();
 
         // non-copyable
