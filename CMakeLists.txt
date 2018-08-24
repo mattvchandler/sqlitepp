@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8.8)
+cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
 project(sqlitepp)
 set(TITLE "Sqlitepp")
 set(AUTHOR "Matthew Chandler <tardarsauce@gmail.com>")
