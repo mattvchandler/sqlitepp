@@ -50,7 +50,7 @@ namespace sqlite
 
     private:
         /// (non-owned) DB connection
-        static Connection * _db;
+        static Connection * db_;
     };
 };
 

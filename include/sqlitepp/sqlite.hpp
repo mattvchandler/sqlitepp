@@ -153,7 +153,7 @@ namespace sqlite
 
     private:
         /// sqlite C API's DB connection obj
-        sqlite3 * _db = nullptr;
+        sqlite3 * db_ = nullptr;
     };
 
     /// Prepared statement obj - usually created by Connection::create_statement
@@ -331,9 +331,9 @@ namespace sqlite
 
     private:
         /// Sqlite C API's prepared statement obj
-        sqlite3_stmt * _stmt = nullptr;
+        sqlite3_stmt * stmt_ = nullptr;
         /// Copy of sqlite DB connection obj
-        sqlite3 * _db = nullptr;
+        sqlite3 * db_ = nullptr;
     };
 };
 

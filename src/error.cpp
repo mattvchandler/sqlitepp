@@ -30,12 +30,12 @@ namespace sqlite
 
     const char * Error::sql() const noexcept
     {
-        return _sql.c_str();
+        return sql_.c_str();
     }
 
     int Error::err_code() const noexcept
     {
-        return _sqlite_error_code;
+        return sqlite_error_code_;
     }
 
     const char * Error::err_str() const noexcept
@@ -45,16 +45,16 @@ namespace sqlite
 
     const char * Error::err_msg() const noexcept
     {
-        if(!_db)
+        if(!db_)
             return "";
 
-        return sqlite3_errmsg(_db);
+        return sqlite3_errmsg(db_);
     }
 
     Error::Error(const std::string & sql, int sqlite_error_code, sqlite3 * db):
-        _sql(sql),
-        _sqlite_error_code(sqlite_error_code),
-        _db(db)
+        sql_(sql),
+        sqlite_error_code_(sqlite_error_code),
+        db_(db)
     {
     }
 

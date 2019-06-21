@@ -28,17 +28,17 @@ namespace sqlite
 {
     Connection & Database::get()
     {
-        if(!_db)
+        if(!db_)
             throw std::logic_error("Database not initialized");
 
-        return *_db;
+        return *db_;
     }
 
     void Database::init(Connection * db)
     {
-        _db = db;
+        db_ = db;
     }
 
     // init to null
-    Connection * Database::_db = nullptr;
+    Connection * Database::db_ = nullptr;
 };

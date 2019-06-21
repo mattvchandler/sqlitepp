@@ -59,9 +59,9 @@ namespace sqlite
         Error(const std::string & sql, int sqlite_error_code, sqlite3 * db);
 
     private:
-        std::string _sql; ///< SQL code assoicated with the error
-        int _sqlite_error_code; ///< Sqlite3 extended error code
-        sqlite3 * _db; ///< Sqlite3 DB object
+        std::string sql_; ///< SQL code assoicated with the error
+        int sqlite_error_code_; ///< Sqlite3 extended error code
+        sqlite3 * db_; ///< Sqlite3 DB object
     };
 
     /// SQL Logic error

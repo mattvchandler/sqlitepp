@@ -29,78 +29,78 @@ using namespace std::string_literals;
 namespace sqlite
 {
     Connection::Stmt::Stmt(const std::string & sql, Connection & db):
-        _db(db.get_c_obj())
+        db_(db.get_c_obj())
     {
-        int status = sqlite3_prepare_v2(db.get_c_obj(), sql.c_str(), sql.length() + 1, &_stmt, NULL);
+        int status = sqlite3_prepare_v2(db.get_c_obj(), sql.c_str(), sql.length() + 1, &stmt_, NULL);
 
         if(status != SQLITE_OK)
         {
-            throw Logic_error("Error parsing SQL: "s + sqlite3_errmsg(db.get_c_obj()), sql, status, _db);
+            throw Logic_error("Error parsing SQL: "s + sqlite3_errmsg(db.get_c_obj()), sql, status, db_);
         }
     }
 
     Connection::Stmt::~Stmt()
     {
-        sqlite3_finalize(_stmt);
+        sqlite3_finalize(stmt_);
     }
 
     void Connection::Stmt::bind(const int index, const double val)
     {
-        int status = sqlite3_bind_double(_stmt, index, val);
+        int status = sqlite3_bind_double(stmt_, index, val);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding index " +
-                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                std::to_string(index) + ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::bind(const int index, const int val)
     {
-        int status = sqlite3_bind_int(_stmt, index, val);
+        int status = sqlite3_bind_int(stmt_, index, val);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding index " +
-                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                std::to_string(index) + ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::bind(const int index, const sqlite3_int64 val)
     {
-        int status = sqlite3_bind_int64(_stmt, index, val);
+        int status = sqlite3_bind_int64(stmt_, index, val);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding index " +
-                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                std::to_string(index) + ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::bind(const int index, const std::string & val)
     {
-        int status = sqlite3_bind_text(_stmt, index, val.c_str(), val.length(), SQLITE_TRANSIENT);
+        int status = sqlite3_bind_text(stmt_, index, val.c_str(), val.length(), SQLITE_TRANSIENT);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding index " +
-                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                std::to_string(index) + ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::bind(const int index, const char * val)
     {
-        int status = sqlite3_bind_text(_stmt, index, val, -1, SQLITE_TRANSIENT);
+        int status = sqlite3_bind_text(stmt_, index, val, -1, SQLITE_TRANSIENT);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding index " +
-                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                std::to_string(index) + ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::bind_null(const int index)
     {
-        int status = sqlite3_bind_null(_stmt, index);
+        int status = sqlite3_bind_null(stmt_, index);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding index " +
-                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                std::to_string(index) + ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
@@ -111,61 +111,61 @@ namespace sqlite
 
     void Connection::Stmt::bind(const std::string & name, const double val)
     {
-        int status = sqlite3_bind_double(_stmt, bind_parameter_index(name), val);
+        int status = sqlite3_bind_double(stmt_, bind_parameter_index(name), val);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding " + name +
-                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::bind(const std::string & name, const int val)
     {
-        int status = sqlite3_bind_int(_stmt, bind_parameter_index(name), val);
+        int status = sqlite3_bind_int(stmt_, bind_parameter_index(name), val);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding " + name +
-                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::bind(const std::string & name, const sqlite3_int64 val)
     {
-        int status = sqlite3_bind_int64(_stmt, bind_parameter_index(name), val);
+        int status = sqlite3_bind_int64(stmt_, bind_parameter_index(name), val);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding " + name +
-                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::bind(const std::string & name, const std::string & val)
     {
-        int status = sqlite3_bind_text(_stmt, bind_parameter_index(name), val.c_str(), val.length(), SQLITE_TRANSIENT);
+        int status = sqlite3_bind_text(stmt_, bind_parameter_index(name), val.c_str(), val.length(), SQLITE_TRANSIENT);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding " + name +
-                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::bind(const std::string & name, const char * val)
     {
-        int status = sqlite3_bind_text(_stmt, bind_parameter_index(name), val, -1, SQLITE_TRANSIENT);
+        int status = sqlite3_bind_text(stmt_, bind_parameter_index(name), val, -1, SQLITE_TRANSIENT);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding " + name +
-                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::bind_null(const std::string & name)
     {
-        int status = sqlite3_bind_null(_stmt, bind_parameter_index(name));
+        int status = sqlite3_bind_null(stmt_, bind_parameter_index(name));
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error binding " + name +
-                ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
@@ -176,34 +176,34 @@ namespace sqlite
 
     std::string Connection::Stmt::bind_parameter_name(const int index)
     {
-        const char * name = sqlite3_bind_parameter_name(_stmt, index);
+        const char * name = sqlite3_bind_parameter_name(stmt_, index);
         if(!name)
         {
             throw Logic_error("Error looking up bind var name for index " +
-                std::to_string(index) + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), SQLITE_ERROR, _db);
+                std::to_string(index) + ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), SQLITE_ERROR, db_);
         }
         return std::string(name);
     }
 
     int Connection::Stmt::bind_parameter_index(const std::string & name)
     {
-        int index = sqlite3_bind_parameter_index(_stmt, name.c_str());
+        int index = sqlite3_bind_parameter_index(stmt_, name.c_str());
         if(!index)
         {
             throw Logic_error("Error looking up index for bind var " +
-                name + ": " + sqlite3_errmsg(_db), sqlite3_sql(_stmt), SQLITE_ERROR, _db);
+                name + ": " + sqlite3_errmsg(db_), sqlite3_sql(stmt_), SQLITE_ERROR, db_);
         }
         return index;
     }
 
     int Connection::Stmt::bind_parameter_count()
     {
-        return sqlite3_bind_parameter_count(_stmt);
+        return sqlite3_bind_parameter_count(stmt_);
     }
 
     bool Connection::Stmt::step()
     {
-        int status = sqlite3_step(_stmt);
+        int status = sqlite3_step(stmt_);
         if(status == SQLITE_ROW)
         {
             return true;
@@ -215,7 +215,7 @@ namespace sqlite
         else
         {
             throw Logic_error("Error evaluating SQL: "s +
-                sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
@@ -227,21 +227,21 @@ namespace sqlite
     template<>
     double Connection::Stmt::get_col<double>(const int column)
     {
-        return sqlite3_column_double(_stmt, column);
+        return sqlite3_column_double(stmt_, column);
     }
 
     /// @copydoc sqlite::Connection::Stmt::get_col()
     template<>
     int Connection::Stmt::get_col<int>(const int column)
     {
-        return sqlite3_column_int(_stmt, column);
+        return sqlite3_column_int(stmt_, column);
     }
 
     /// @copydoc sqlite::Connection::Stmt::get_col()
     template<>
     sqlite3_int64 Connection::Stmt::get_col<sqlite3_int64>(const int column)
     {
-        return sqlite3_column_int64(_stmt, column);
+        return sqlite3_column_int64(stmt_, column);
     }
 
     /// @copydoc sqlite::Connection::Stmt::get_col()
@@ -249,7 +249,7 @@ namespace sqlite
     template<>
     std::string Connection::Stmt::get_col<std::string>(const int column)
     {
-        const char * str = reinterpret_cast<const char *>(sqlite3_column_text(_stmt, column));
+        const char * str = reinterpret_cast<const char *>(sqlite3_column_text(stmt_, column));
 
         if(!str)
             return ""s; // empty str for NULL data
@@ -261,43 +261,43 @@ namespace sqlite
     template<>
     const char * Connection::Stmt::get_col<const char *>(const int column)
     {
-        return reinterpret_cast<const char *>(sqlite3_column_text(_stmt, column));
+        return reinterpret_cast<const char *>(sqlite3_column_text(stmt_, column));
     }
 
     /// @}
 
     void Connection::Stmt::reset()
     {
-        int status = sqlite3_reset(_stmt);
+        int status = sqlite3_reset(stmt_);
         if(status != SQLITE_OK)
         {
             throw Logic_error("Error resetting statement: "s +
-                sqlite3_errmsg(_db), sqlite3_sql(_stmt), status, _db);
+                sqlite3_errmsg(db_), sqlite3_sql(stmt_), status, db_);
         }
     }
 
     void Connection::Stmt::clear_bindings()
     {
-        sqlite3_clear_bindings(_stmt);
+        sqlite3_clear_bindings(stmt_);
     }
 
     bool Connection::Stmt::busy()
     {
-        return bool(sqlite3_stmt_busy(_stmt));
+        return bool(sqlite3_stmt_busy(stmt_));
     }
 
     bool Connection::Stmt::readonly()
     {
-        return bool(sqlite3_stmt_readonly(_stmt));
+        return bool(sqlite3_stmt_readonly(stmt_));
     }
 
     const sqlite3_stmt * Connection::Stmt::get_c_obj() const
     {
-        return _stmt;
+        return stmt_;
     }
 
     sqlite3_stmt * Connection::Stmt::get_c_obj()
     {
-        return _stmt;
+        return stmt_;
     }
 };

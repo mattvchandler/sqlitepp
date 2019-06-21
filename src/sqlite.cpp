@@ -28,19 +28,19 @@ namespace sqlite
 {
     Connection::Connection(const std::string & filename)
     {
-        int status = sqlite3_open(filename.c_str(), &_db);
+        int status = sqlite3_open(filename.c_str(), &db_);
         if(status != SQLITE_OK)
         {
-            sqlite3_close(_db);
+            sqlite3_close(db_);
             throw Runtime_error("Error connecting to db (" +
-                filename + "): " + sqlite3_errmsg(_db), "", status, nullptr);
+                filename + "): " + sqlite3_errmsg(db_), "", status, nullptr);
         }
-        sqlite3_extended_result_codes(_db, true);
+        sqlite3_extended_result_codes(db_, true);
     }
 
     Connection::~Connection()
     {
-        sqlite3_close(_db);
+        sqlite3_close(db_);
     }
 
     Connection::Stmt Connection::create_statement(const std::string & sql)
@@ -51,7 +51,7 @@ namespace sqlite
     void Connection::exec(const std::string & sql, int (*callback)(void *, int, char **, char **), void * arg)
     {
         char * err_msg = nullptr;
-        int status = sqlite3_exec(_db, sql.c_str(), callback, arg, &err_msg);
+        int status = sqlite3_exec(db_, sql.c_str(), callback, arg, &err_msg);
 
         if(err_msg || status != SQLITE_OK)
         {
@@ -61,7 +61,7 @@ namespace sqlite
                 err = err_msg;
                 sqlite3_free(err_msg);
             }
-            throw Logic_error("Error evaluating SQL: " + err, sql, status, _db);
+            throw Logic_error("Error evaluating SQL: " + err, sql, status, db_);
         }
     }
 
@@ -82,17 +82,17 @@ namespace sqlite
 
     void Connection::interrupt()
     {
-        sqlite3_interrupt(_db);
+        sqlite3_interrupt(db_);
     }
 
     sqlite3_int64 Connection::last_insert_rowid()
     {
-        return sqlite3_last_insert_rowid(_db);
+        return sqlite3_last_insert_rowid(db_);
     }
 
     int Connection::total_changes()
     {
-        return sqlite3_total_changes(_db);
+        return sqlite3_total_changes(db_);
     }
 
     Connection::Column_metadata Connection::table_column_metadata(const std::string & table_name, const std::string & column_name,
@@ -101,15 +101,15 @@ namespace sqlite
         const char * type, * collation;
         int not_null, primary_key, auto_inc;
 
-        int status = sqlite3_table_column_metadata(_db, db_name.c_str(), table_name.c_str(), column_name.c_str(),
+        int status = sqlite3_table_column_metadata(db_, db_name.c_str(), table_name.c_str(), column_name.c_str(),
             &type, &collation, &not_null, &primary_key, &auto_inc);
 
         if(status != SQLITE_OK)
         {
-            sqlite3_close(_db);
+            sqlite3_close(db_);
             throw Runtime_error("Error getting column info (" +
                 db_name + "." + table_name + "." + column_name + "): " +
-                sqlite3_errmsg(_db), "", status, nullptr);
+                sqlite3_errmsg(db_), "", status, nullptr);
         }
 
         Column_metadata ret;
@@ -124,11 +124,11 @@ namespace sqlite
 
     const sqlite3 * Connection::get_c_obj() const
     {
-        return _db;
+        return db_;
     }
 
     sqlite3 * Connection::get_c_obj()
     {
-        return _db;
+        return db_;
     }
 };
