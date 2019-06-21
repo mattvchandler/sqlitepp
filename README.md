@@ -55,7 +55,7 @@ Sqlitepp is configured to generate a .deb package file. To do so, substitute the
 above with the following:
 
     $ mkdir build && cd build
-    $ cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS
+    $ cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS=1
     $ make
     $ cpack
     # dpkg -i libsqlitepp-dev*.deb
