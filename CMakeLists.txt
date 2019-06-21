@@ -113,8 +113,8 @@ if(GIT_FOUND)
 
         string(REGEX REPLACE \"^v([0-9]+)\\\\..*\" \"\\\\1\" VERSION_MAJOR \"\${VERSION_FULL}\")
         string(REGEX REPLACE \"^v[0-9]+\\\\.([0-9]+).*\" \"\\\\1\" VERSION_MINOR \"\${VERSION_FULL}\")
-        string(REGEX REPLACE \"^v[0-9]+\\\\.[0-9]+-([0-9]+).*\" \"\\\\1\" VERSION_PATCH \"\${VERSION_FULL}\")
-        string(REGEX REPLACE \"^v[0-9]+\\\\.[0-9]+-[0-9]+-(.*)\" \"\\\\1\" VERSION_SHA1 \"\${VERSION_FULL}\")
+        string(REGEX REPLACE \"^v[0-9]+\\\\.[0-9]+\\\\.([0-9]+).*\" \"\\\\1\" VERSION_PATCH \"\${VERSION_FULL}\")
+        string(REGEX REPLACE \"^v[0-9]+\\\\.[0-9]+\\\\.[0-9]+-(.*)\" \"\\\\1\" VERSION_SHA1 \"\${VERSION_FULL}\")
 
         if(NOT VERSION_PATCH OR VERSION_PATCH STREQUAL VERSION_FULL)
             set(VERSION_PATCH 0)
