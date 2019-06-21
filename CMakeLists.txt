@@ -2,9 +2,15 @@ cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
 project(sqlitepp)
 set(TITLE "Sqlitepp")
 set(AUTHOR "Matthew Chandler <tardarsauce@gmail.com>")
-set(COPYRIGHT "2015 Matthew Chandler")
+set(COPYRIGHT "2019 Matthew Chandler")
 set(SUMMARY "A thin sqlite C++ wrapper")
 set(WEBSITE "http://github.com/mattvchandler/sqlitepp")
+
+set(VERSION_MAJOR 1)
+set(VERSION_MINOR 2)
+set(VERSION_PATCH 2)
+
+set(VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,7 +22,6 @@ endif()
 
 # libraries
 option(SQLITEPP_GEN_DOC_TARGET "Generate 'doc' target" ON)
-option(SQLITEPP_GIT_VERSIONING "Get version info from git" ON)
 
 option(INCLUDE_SQLITE "Download and include sqlite3 (removes dependency on external sqlite library)" OFF)
 
@@ -26,12 +31,12 @@ option(DISABLE_STATIC_LIBS "Disable building of shared library" OFF)
 if(INCLUDE_SQLITE)
     find_package(Threads REQUIRED)
 
-    set(SQLITE_VERSION_STR "3090200")
+    set(SQLITE_VERSION_STR "3280000")
     set(SQLITE_ARCHIVE_NAME "sqlite-amalgamation-${SQLITE_VERSION_STR}")
 
     file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/get_sqlite.cmake" CONTENT
         "file(DOWNLOAD
-        https://www.sqlite.org/2015/${SQLITE_ARCHIVE_NAME}.zip
+        https://www.sqlite.org/2019/${SQLITE_ARCHIVE_NAME}.zip
             \"${PROJECT_BINARY_DIR}/${SQLITE_ARCHIVE_NAME}.zip\"
             SHOW_PROGRESS)
 
@@ -101,112 +106,21 @@ if(SQLITEPP_GEN_DOC_TARGET)
     endif()
 endif()
 
-# git version info
-if(SQLITEPP_GIT_VERSIONING)
-    find_package(Git)
-endif()
-if(GIT_FOUND)
-    file(GENERATE OUTPUT ${PROJECT_BINARY_DIR}/version.cmake CONTENT
-        "execute_process(COMMAND \"${GIT_EXECUTABLE}\" describe --tags --dirty
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-            OUTPUT_VARIABLE VERSION_FULL)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
+    ${PROJECT_BINARY_DIR}/Doxyfile
+    @ONLY)
 
-        string(REGEX REPLACE \"^v([0-9]+)\\\\..*\" \"\\\\1\" VERSION_MAJOR \"\${VERSION_FULL}\")
-        string(REGEX REPLACE \"^v[0-9]+\\\\.([0-9]+).*\" \"\\\\1\" VERSION_MINOR \"\${VERSION_FULL}\")
-        string(REGEX REPLACE \"^v[0-9]+\\\\.[0-9]+\\\\.([0-9]+).*\" \"\\\\1\" VERSION_PATCH \"\${VERSION_FULL}\")
-        string(REGEX REPLACE \"^v[0-9]+\\\\.[0-9]+\\\\.[0-9]+-(.*)\" \"\\\\1\" VERSION_SHA1 \"\${VERSION_FULL}\")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake.in
+    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+    @ONLY)
 
-        if(NOT VERSION_PATCH OR VERSION_PATCH STREQUAL VERSION_FULL)
-            set(VERSION_PATCH 0)
-        endif()
-        if(NOT VERSION_SHA1 OR VERSION_SHA1 STREQUAL VERSION_FULL)
-            set(VERSION_SHA1 \"\")
-        endif()
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config-version.cmake.in
+    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+    @ONLY)
 
-        set(VERSION_SHORT \"\${VERSION_MAJOR}.\${VERSION_MINOR}.\${VERSION_PATCH}\")
-
-        set(PROJECT_NAME \"${PROJECT_NAME}\")
-        set(TITLE \"${TITLE}\")
-        set(SUMMARY \"${SUMMARY}\")
-        set(CMAKE_INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
-        set(CMAKE_CURRENT_SOURCE_DIR  \"${CMAKE_CURRENT_SOURCE_DIR}\")
-
-        message(STATUS \"${TITLE} version \${VERSION_FULL}\")
-
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
-            ${PROJECT_BINARY_DIR}/Doxyfile
-            @ONLY)
-
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake.in
-            ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
-            @ONLY)
-
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config-version.cmake.in
-            ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
-            @ONLY)
-
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
-            ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
-            @ONLY)\n")
-
-    add_custom_target(version
-        COMMAND ${CMAKE_COMMAND}
-        -P ${CMAKE_BINARY_DIR}/version.cmake
-        DEPENDS
-            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
-            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake.in
-            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config-version.cmake.in
-            ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
-        BYPRODUCTS
-            ${PROJECT_BIBARY_DIR}/${PROJECT_NAME}.pc
-            ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
-            ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
-            ${PROJECT_BINARY_DIR}/Doxyfile
-        COMMENT "Getting version from git"
-        )
-
-    execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --dirty
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        OUTPUT_VARIABLE VERSION_FULL)
-
-    string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION_FULL}")
-    string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${VERSION_FULL}")
-    string(REGEX REPLACE "^v[0-9]+\\.[0-9]+-([0-9]+).*" "\\1" VERSION_PATCH "${VERSION_FULL}")
-    string(REGEX REPLACE "^v[0-9]+\\.[0-9]+-[0-9]+-(.*)" "\\1" VERSION_SHA1 "${VERSION_FULL}")
-
-    if(NOT VERSION_PATCH OR VERSION_PATCH STREQUAL VERSION_FULL)
-        set(VERSION_PATCH 0)
-    endif()
-    if(NOT VERSION_SHA1 OR VERSION_SHA1 STREQUAL VERSION_FULL)
-        set(VERSION_SHA1 "")
-    endif()
-
-    set(VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-
-    if(DOXYGEN_FOUND)
-        add_dependencies(doc version)
-    endif()
-else()
-    # manually update each minor release
-    set(VERSION_MAJOR 1)
-    set(VERSION_MINOR 2)
-    set(VERSION_PATCH 0)
-    set(VERSION_SHA1 "")
-    set(VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-    set(VERSION_FULL "${VERSION_SHORT}")
-
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
-        ${PROJECT_BINARY_DIR}/Doxyfile
-        @ONLY)
-
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake.in
-        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
-        @ONLY)
-
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
-        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
-        @ONLY)
-endif()
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
+    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
+    @ONLY)
 
 # main compilation
 add_library(${PROJECT_NAME}_obj OBJECT ${SOURCES})
@@ -253,10 +167,6 @@ else()
         ${SQLITE_LIBRARIES}
         )
     endforeach()
-endif()
-
-if(GIT_FOUND)
-    add_dependencies(${PROJECT_NAME}_obj version)
 endif()
 
 # install targets
