@@ -61,7 +61,7 @@ above with the following:
     # dpkg -i libsqlitepp-dev*.deb
 
 When linking your own code using sqlitepp, you will need to link to both the
-sqlitepp and sqlite3 libraries: `-l sqlitepp -lsqlite3` (depending on your OS)
+sqlitepp and sqlite3 libraries: `-lsqlitepp -lsqlite3` (depending on your OS)
 
 #### Documentation
 If doxygen is installed, library documentation can be generated with: `$ make doc`
