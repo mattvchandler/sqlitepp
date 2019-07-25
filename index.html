@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Sqlitepp
-   &#160;<span id="projectnumber">1.2.2</span>
+   &#160;<span id="projectnumber">1.2.3</span>
    </div>
    <div id="projectbrief">A thin sqlite C++ wrapper</div>
   </td>
@@ -92,7 +92,7 @@ $ cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS=1
 $ make
 $ cpack
 # dpkg -i libsqlitepp-dev*.deb
-</pre><p>When linking your own code using sqlitepp, you will need to link to both the sqlitepp and sqlite3 libraries: <code>-l sqlitepp -lsqlite3</code> (depending on your OS)</p>
+</pre><p>When linking your own code using sqlitepp, you will need to link to both the sqlitepp and sqlite3 libraries: <code>-lsqlitepp -lsqlite3</code> (depending on your OS)</p>
 <h4>Documentation</h4>
 <p>If doxygen is installed, library documentation can be generated with: <code>$ make doc</code> </p>
 </div></div><!-- contents -->
