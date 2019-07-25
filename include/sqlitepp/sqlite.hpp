@@ -56,9 +56,9 @@ namespace sqlite
         Connection(const Connection &) = delete;
         Connection & operator=(const Connection &) = delete;
 
-        // need to explicitly say we want default move ctors
-        Connection(Connection &&) = default;
-        Connection & operator=(Connection &&) = default;
+        // movable
+        Connection(Connection &&);
+        Connection & operator=(Connection &&);
 
         /// Create a new prepared statement
 
@@ -181,9 +181,9 @@ namespace sqlite
         Stmt(const Stmt &) = delete;
         Stmt & operator=(const Stmt &) = delete;
 
-        // need to explicit say we want default move ctors
-        Stmt(Stmt &&) = default;
-        Stmt & operator=(Stmt &&) = default;
+        // movable
+        Stmt(Stmt &&);
+        Stmt & operator=(Stmt &&);
 
         /// @name Bind functions
         /// Functions for binding data to SQL statements

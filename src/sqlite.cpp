@@ -43,6 +43,22 @@ namespace sqlite
         sqlite3_close(db_);
     }
 
+    Connection::Connection(Connection && other): db_{other.db_}
+    {
+        other.db_ = nullptr;
+    }
+
+    Connection & Connection::operator=(Connection && other)
+    {
+        if(&other != this)
+        {
+            sqlite3_close(db_);
+            db_ = other.db_;
+            other.db_ = nullptr;
+        }
+        return *this;
+    }
+
     Connection::Stmt Connection::create_statement(const std::string & sql)
     {
         return Stmt(sql, *this);

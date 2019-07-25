@@ -44,6 +44,24 @@ namespace sqlite
         sqlite3_finalize(stmt_);
     }
 
+    Connection::Stmt::Stmt(Connection::Stmt && other): stmt_{other.stmt_}, db_{other.db_}
+    {
+        other.stmt_ = nullptr;
+    }
+
+    Connection::Stmt & Connection::Stmt::operator=(Connection::Stmt && other)
+    {
+        if(&other != this)
+        {
+            sqlite3_finalize(stmt_);
+            stmt_ = other.stmt_;
+            db_ = other.db_;
+            other.stmt_ = nullptr;
+        }
+        return *this;
+    }
+
+
     void Connection::Stmt::bind(const int index, const double val)
     {
         int status = sqlite3_bind_double(stmt_, index, val);
